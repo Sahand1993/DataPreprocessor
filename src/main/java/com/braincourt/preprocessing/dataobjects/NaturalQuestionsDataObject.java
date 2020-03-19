@@ -1,8 +1,5 @@
 package com.braincourt.preprocessing.dataobjects;
 
-import com.braincourt.preprocessing.dataobjects.DataObject;
-import com.braincourt.preprocessing.dataobjects.LongAnswerCandidate;
-import com.braincourt.preprocessing.dataobjects.NaturalQuestionsToken;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -12,7 +9,8 @@ public class NaturalQuestionsDataObject extends DataObject {
     private List<NaturalQuestionsToken> documentTokens;
     private String documentTitle;
     private List<String> questionTokens;
-    private List<LongAnswerCandidate> longAnswerCandidates;
+ //   private List<LongAnswerCandidate> longAnswerCandidates;
+    private int id;
 
     public String getDocumentTitle() {
         return documentTitle;
@@ -30,8 +28,16 @@ public class NaturalQuestionsDataObject extends DataObject {
         this.documentTokens = tokens;
     }
 
+    public List<String> getQuestionTokens() {
+        return questionTokens;
+    }
+
     public void setQuestionTokens(List<String> tokens) {
         this.questionTokens = tokens;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -40,7 +46,7 @@ public class NaturalQuestionsDataObject extends DataObject {
         return gson.toJson(this);
     }
 
-    public void setLongAnswerCandidates(List<LongAnswerCandidate> longAnswerCandidates) {
-        this.longAnswerCandidates = longAnswerCandidates;
-    }
+ //   public void setLongAnswerCandidates(List<LongAnswerCandidate> longAnswerCandidates) {
+ //       this.longAnswerCandidates = longAnswerCandidates;
+ //   }
 }

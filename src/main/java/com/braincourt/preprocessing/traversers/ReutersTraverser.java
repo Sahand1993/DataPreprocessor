@@ -23,6 +23,7 @@ public class ReutersTraverser extends Traverser {
                 .filter(File::isDirectory)
                 .filter(file -> !NON_DATA_DIRNAMES.contains(file.getName()))
                 .flatMap(file -> Arrays.stream(Objects.requireNonNull(file.listFiles())))
+                .filter(file -> file.getName().endsWith(".xml"))
                 .map(File::toPath);
     }
 }

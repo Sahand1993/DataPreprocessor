@@ -4,7 +4,7 @@ public class NaturalQuestionsToken {
 
     int start_byte;
     int end_byte;
-    Boolean html_token;
+    Boolean html_token; // TODO: Consider removing
     String token;
 
     public int getStartByte() {

@@ -9,21 +9,21 @@ public class QuoraQuestionPairDataObject extends DataObject {
     int id;
     int question1Id;
     int question2Id;
-    List<String> question1;
-    List<String> question2;
+    List<String> question1_tokens;
+    List<String> question2_tokens;
     Boolean isDuplicate;
 
     public QuoraQuestionPairDataObject(int id,
                                        int question1Id,
                                        int question2Id,
-                                       List<String> question1,
-                                       List<String> question2,
+                                       List<String> question1Tokens,
+                                       List<String> question2Tokens,
                                        Boolean isDuplicate) {
         this.id = id;
         this.question1Id = question1Id;
         this.question2Id = question2Id;
-        this.question1 = question1;
-        this.question2 = question2;
+        this.question1_tokens = question1Tokens;
+        this.question2_tokens = question2Tokens;
         this.isDuplicate = isDuplicate;
     }
 
@@ -56,20 +56,20 @@ public class QuoraQuestionPairDataObject extends DataObject {
         this.question2Id = question2Id;
     }
 
-    public List<String> getQuestion1() {
-        return question1;
+    public List<String> getQuestion1Tokens() {
+        return question1_tokens;
     }
 
-    public void setQuestion1(List<String> question1) {
-        this.question1 = question1;
+    public void setQuestion1Tokens(List<String> question1_tokens) {
+        this.question1_tokens = question1_tokens;
     }
 
-    public List<String> getQuestion2() {
-        return question2;
+    public List<String> getQuestion2Tokens() {
+        return question2_tokens;
     }
 
-    public void setQuestion2(List<String> question2) {
-        this.question2 = question2;
+    public void setQuestion2Tokens(List<String> question2_tokens) {
+        this.question2_tokens = question2_tokens;
     }
 
     public Boolean getDuplicate() {

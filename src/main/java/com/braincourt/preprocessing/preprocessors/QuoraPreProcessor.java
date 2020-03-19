@@ -3,6 +3,7 @@ package com.braincourt.preprocessing.preprocessors;
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
 import com.braincourt.preprocessing.dataobjects.QuoraQuestionPairDataObject;
+import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
 import java.io.BufferedReader;
@@ -29,16 +30,25 @@ public class QuoraPreProcessor extends PreProcessor {
         try {
 
             BufferedReader bufferedReader = new BufferedReader(new FileReader(dataFilePath.toAbsolutePath().toString()));
-            CSVReader reader = new CSVReader(bufferedReader);
-            return StreamSupport.stream(reader.spliterator(), true)
+            return bufferedReader.lines()
                     .skip(1)
-                    .map(line -> new QuoraQuestionPairDataObject(
-                                    Integer.parseInt(line[0]),
-                                    Integer.parseInt(line[1]),
-                                    Integer.parseInt(line[2]),
-                                    tokenizer.tokenize(line[3]),
-                                    tokenizer.tokenize(line[4]),
-                                    Boolean.parseBoolean(line[5])));
+                    .map(line -> {
+                        String[] fields;
+                        try {
+                            fields = new CSVParser().parseLine(line);
+                            return new QuoraQuestionPairDataObject(
+                                    Integer.parseInt(fields[0]),
+                                    Integer.parseInt(fields[1]),
+                                    Integer.parseInt(fields[2]),
+                                    tokenizer.tokenize(fields[3]),
+                                    tokenizer.tokenize(fields[4]),
+                                    Integer.parseInt(fields[5]) == 1);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            System.exit(1);
+                            return null;
+                        }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();

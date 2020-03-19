@@ -2,7 +2,6 @@ package com.braincourt.preprocessing.preprocessors;
 
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
-import com.braincourt.preprocessing.dataobjects.LongAnswerCandidate;
 import com.braincourt.preprocessing.dataobjects.NaturalQuestionsDataObject;
 import com.braincourt.preprocessing.dataobjects.NaturalQuestionsToken;
 import com.braincourt.preprocessing.jsonpojos.NaturalQuestionsJsonPojo;
@@ -13,9 +12,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class NaturalQuestionsPreProcessor extends PreProcessor {
+
+    int currentId = 0;
 
     public NaturalQuestionsPreProcessor(Tokenizer tokenizer) {
         super(tokenizer);
@@ -31,7 +33,8 @@ public class NaturalQuestionsPreProcessor extends PreProcessor {
             FileReader reader = new FileReader(path.toAbsolutePath().toString());
             BufferedReader bufferedReader = new BufferedReader(reader);
             return bufferedReader.lines()
-                    .map(this::toDataObject);
+                    .map(this::toDataObject)
+                    .filter(Objects::nonNull);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,19 +48,26 @@ public class NaturalQuestionsPreProcessor extends PreProcessor {
         NaturalQuestionsJsonPojo naturalQuestionsJsonPojo = new Gson().fromJson(line, NaturalQuestionsJsonPojo.class);
         NaturalQuestionsDataObject nqDataObject = new NaturalQuestionsDataObject();
 
+        nqDataObject.setId(currentId++);
+
         nqDataObject.setDocumentTitle(naturalQuestionsJsonPojo.getDocumentTitle());
 
         List<NaturalQuestionsToken> tokens = naturalQuestionsJsonPojo.getDocumentTokens();
         nqDataObject.setDocumentTokens(
                 tokenizer.filterNaturalQuestionTokens(tokens.stream()
-                        .filter(token -> !token.isHtmlToken()))
+                        .filter(token -> !token.isHtmlToken())) // TODO: consider adding another map-clause where NaturalQuestionsToken is transformed to new object NaturalQuestionsTokenLight that doesn't have the html_token boolean
         );
 
-        List<LongAnswerCandidate> longAnswerCandidates = naturalQuestionsJsonPojo.getLongAnswerCandidates();
-        nqDataObject.setLongAnswerCandidates(longAnswerCandidates);
+      //  List<LongAnswerCandidate> longAnswerCandidates = naturalQuestionsJsonPojo.getLongAnswerCandidates();
+      //  nqDataObject.setLongAnswerCandidates(longAnswerCandidates);
 
         List<String> questionTokens = naturalQuestionsJsonPojo.getQuestionTokens();
-        nqDataObject.setQuestionTokens(tokenizer.filterTokens(questionTokens.stream()));
+        List<String> filteredQuestionTokens = tokenizer.filterTokens(questionTokens.stream());
+        nqDataObject.setQuestionTokens(filteredQuestionTokens);
+
+        if (filteredQuestionTokens.size() == 0) {
+            return null;
+        }
 
         return nqDataObject;
     }

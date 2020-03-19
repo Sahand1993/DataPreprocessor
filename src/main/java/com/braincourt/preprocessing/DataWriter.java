@@ -1,7 +1,6 @@
 package com.braincourt.preprocessing;
 
 import com.braincourt.preprocessing.dataobjects.DataObject;
-import com.braincourt.preprocessing.dataobjects.ReutersDataObject;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,18 +46,20 @@ public class DataWriter {
                 System.out.println(String.format("Beginning processing of %s folder.", outputFolder));
 
                 dataObjects.forEach(dataObject -> {
+
                     try {
+
                         bufferedWriter.write(dataObject.toJsonString());
                         bufferedWriter.newLine();
 
                     } catch (IOException e) {
+
                         e.printStackTrace();
 
                     }
                     if (++processedFiles % 1000 == 0) {
                         System.out.println(String.format("wrote %d lines.", processedFiles));
                     }
-
 
                 });
                 System.out.println(String.format("Finished writing to %s. Lines written: %d.", filePath, processedFiles));

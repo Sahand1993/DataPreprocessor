@@ -22,7 +22,7 @@ public class Tokenizer {
     Set<String> stopwords;
     String dataDir;
 
-    Pattern validTokenRegex = Pattern.compile("[\\p{L}&&[^_]]+"); // all unicode and numbers, no underscores
+    Pattern validTokenRegex = Pattern.compile("[\\p{IsLatin}&&[^_]]+"); // all unicode and numbers, no underscores
 
     public Tokenizer(String dataDir) {
         this.dataDir = dataDir;
@@ -63,7 +63,7 @@ public class Tokenizer {
     }
 
     public List<NaturalQuestionsToken> filterNaturalQuestionTokens(Stream<NaturalQuestionsToken> tokens) {
-        return tokens
+        return tokens// TODO: Remove end punctuation like in filterTokens() above
                 .filter(token -> isValidToken(token.getToken()))
                 .map(token -> token.setToken(normalizeToken(token.getToken())))
                 .collect(Collectors.toList());
@@ -74,7 +74,7 @@ public class Tokenizer {
     }
 
     private String normalizeToken(String token) {
-        return stem(token.toLowerCase());
+        return stem(token.toLowerCase().trim());
     }
 
     private boolean hasValidRegex(String token) {
