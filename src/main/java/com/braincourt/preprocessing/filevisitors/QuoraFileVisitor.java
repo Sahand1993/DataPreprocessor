@@ -1,22 +1,19 @@
-package com.braincourt.preprocessing.preprocessors;
+package com.braincourt.preprocessing.filevisitors;
 
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
 import com.braincourt.preprocessing.dataobjects.QuoraQuestionPairDataObject;
 import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public class QuoraPreProcessor extends PreProcessor {
+public class QuoraFileVisitor extends FileVisitor {
 
-    public QuoraPreProcessor(Tokenizer tokenizer) {
+    public QuoraFileVisitor(Tokenizer tokenizer) {
         super(tokenizer);
 
     }

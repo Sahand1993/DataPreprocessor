@@ -1,30 +1,56 @@
 package com.braincourt.preprocessing;
 
 import com.braincourt.preprocessing.dataobjects.DataObject;
-import com.braincourt.preprocessing.preprocessors.NaturalQuestionsPreProcessor;
-import com.braincourt.preprocessing.preprocessors.PreProcessor;
-import com.braincourt.preprocessing.preprocessors.QuoraPreProcessor;
-import com.braincourt.preprocessing.preprocessors.ReutersPreProcessor;
+import com.braincourt.preprocessing.filevisitors.NaturalQuestionsFileVisitor;
+import com.braincourt.preprocessing.filevisitors.FileVisitor;
+import com.braincourt.preprocessing.filevisitors.QuoraFileVisitor;
+import com.braincourt.preprocessing.filevisitors.ReutersFileVisitor;
 import com.braincourt.preprocessing.traversers.NaturalQuestionsTraverser;
 import com.braincourt.preprocessing.traversers.QuoraTraverser;
 import com.braincourt.preprocessing.traversers.ReutersTraverser;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
+@Component
 public class Processing {
 
-    String datasetDir;
-    DataWriter writer;
+    @Value("${reuters.raw.home}")
+    String rawReutersDir;
 
-    public Processing(String datasetDir) {
-        this.datasetDir = datasetDir;
-        this.writer = new DataWriter(datasetDir + "../preprocessed_datasets" );
+    @Value("${quora.raw.home}")
+    String rawQuoraDir;
+
+    @Value("${naturalQuestions.raw.home}")
+    String rawNqDir;
+
+    @Value("${stopwords.file}")
+    String stopwordsFile;
+
+    @Value("${naturalQuestions.home}")
+    String preprocessedNqDir;
+
+    @Value("${reuters.home}")
+    String preprocessedReutersDir;
+
+    @Value("${quora.home}")
+    String preprocessedQuoraDir;
+
+    @Value("${filename.json}")
+    String jsonFileName;
+
+    DataWriter dataWriter;
+
+
+    public Processing(DataWriter dataWriter) {
+        this.dataWriter = dataWriter;
     }
 
     public void preprocessDatasets() {
-        Tokenizer tokenizer = new Tokenizer(datasetDir + "/stopwords.json");
+        Tokenizer tokenizer = new Tokenizer(stopwordsFile);
 
         preprocessReuters(tokenizer);
 
@@ -34,30 +60,29 @@ public class Processing {
     }
 
     private void preprocessReuters(Tokenizer tokenizer) {
-        String reutersDataDir = datasetDir + "/reuters";
-        PreProcessor reutersPreProcessor = new ReutersPreProcessor(tokenizer);
-        ReutersTraverser reutersTraverser = new ReutersTraverser(Paths.get(reutersDataDir));
+        ReutersTraverser reutersTraverser = new ReutersTraverser(Paths.get(rawReutersDir));
         Stream<Path> reutersPaths = reutersTraverser.getProcessablePaths();
-        Stream<DataObject> dataObjects = reutersPreProcessor.toDataObjects(reutersPaths);
-        writer.writeObjects(dataObjects, "/rcv1/");
+        FileVisitor reutersFileVisitor = new ReutersFileVisitor(tokenizer);
+        Stream<DataObject> dataObjects = reutersFileVisitor.toDataObjects(reutersPaths);
+        DataWriter dataWriter = new DataWriter(jsonFileName);
+        dataWriter.writeObjects(dataObjects, preprocessedReutersDir);
     }
 
     private void preprocessNaturalQuestions(Tokenizer tokenizer) {
-        String nqDataDir = datasetDir + "/nq/";
-        NaturalQuestionsTraverser nqTraverser = new NaturalQuestionsTraverser(Paths.get(nqDataDir));
+        NaturalQuestionsTraverser nqTraverser = new NaturalQuestionsTraverser(Paths.get(rawNqDir));
         Stream<Path> nqPaths = nqTraverser.getProcessablePaths();
-        PreProcessor nqPreProcessor = new NaturalQuestionsPreProcessor(tokenizer);
-        Stream<DataObject> dataObjects = nqPreProcessor.toDataObjects(nqPaths);
-        writer.writeObjects(dataObjects, "/nq/"); // TODO: Make it so that we send in the whole path here, if possible
+        FileVisitor nqFileVisitor = new NaturalQuestionsFileVisitor(tokenizer);
+        Stream<DataObject> dataObjects = nqFileVisitor.toDataObjects(nqPaths);
+        DataWriter dataWriter = new DataWriter(jsonFileName);
+        dataWriter.writeObjects(dataObjects, preprocessedNqDir);
     }
 
     private void preprocessQuora(Tokenizer tokenizer) {
-        String quoraDataDir = datasetDir + "/quora/";
-        QuoraTraverser quoraTraverser = new QuoraTraverser(Paths.get(quoraDataDir));
+        QuoraTraverser quoraTraverser = new QuoraTraverser(Paths.get(rawQuoraDir));
         Stream<Path> quoraPaths = quoraTraverser.getProcessablePaths();
-        PreProcessor quoraPreProcessor = new QuoraPreProcessor(tokenizer);
-        Stream<DataObject> dataObjects = quoraPreProcessor.toDataObjects(quoraPaths);
-        writer.writeObjects(dataObjects, "/quora/"); // TODO
+        FileVisitor quoraFileVisitor = new QuoraFileVisitor(tokenizer);
+        Stream<DataObject> dataObjects = quoraFileVisitor.toDataObjects(quoraPaths);
+        DataWriter dataWriter = new DataWriter(jsonFileName);
+        dataWriter.writeObjects(dataObjects, preprocessedQuoraDir);
     }
-
 }

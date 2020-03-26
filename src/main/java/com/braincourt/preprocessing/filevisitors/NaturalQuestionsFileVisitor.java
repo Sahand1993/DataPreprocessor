@@ -1,4 +1,4 @@
-package com.braincourt.preprocessing.preprocessors;
+package com.braincourt.preprocessing.filevisitors;
 
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class NaturalQuestionsPreProcessor extends PreProcessor {
+public class NaturalQuestionsFileVisitor extends FileVisitor {
 
     int currentId = 0;
 
-    public NaturalQuestionsPreProcessor(Tokenizer tokenizer) {
+    public NaturalQuestionsFileVisitor(Tokenizer tokenizer) {
         super(tokenizer);
     }
 
@@ -57,9 +57,6 @@ public class NaturalQuestionsPreProcessor extends PreProcessor {
                 tokenizer.filterNaturalQuestionTokens(tokens.stream()
                         .filter(token -> !token.isHtmlToken())) // TODO: consider adding another map-clause where NaturalQuestionsToken is transformed to new object NaturalQuestionsTokenLight that doesn't have the html_token boolean
         );
-
-      //  List<LongAnswerCandidate> longAnswerCandidates = naturalQuestionsJsonPojo.getLongAnswerCandidates();
-      //  nqDataObject.setLongAnswerCandidates(longAnswerCandidates);
 
         List<String> questionTokens = naturalQuestionsJsonPojo.getQuestionTokens();
         List<String> filteredQuestionTokens = tokenizer.filterTokens(questionTokens.stream());

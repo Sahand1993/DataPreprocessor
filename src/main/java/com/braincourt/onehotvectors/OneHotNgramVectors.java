@@ -1,15 +1,15 @@
 package com.braincourt.onehotvectors;
 
-import com.braincourt.onehotvectors.writers.NaturalQuestionsWriter;
-import com.braincourt.onehotvectors.writers.QuoraWriter;
-import com.braincourt.onehotvectors.writers.ReutersWriter;
-import com.braincourt.onehotvectors.writers.Writer;
+import com.braincourt.onehotvectors.writers.database.DatabaseWriter;
+import com.braincourt.onehotvectors.writers.database.DuplicateQuestionsDatabaseWriter;
+import com.braincourt.onehotvectors.writers.database.NaturalQuestionsDatabaseWriter;
+import com.braincourt.onehotvectors.writers.database.Rcv1ArticlesDatabaseWriter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,52 +18,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.braincourt.Constants.*;
-
 /**
  * This class should turn the dataset into n-gram word vectors.
  *
  */
+@Component
 public class OneHotNgramVectors {
 
-    private String processedDatasetDir;
+    private String processedDataDir;
     private BufferedWriter bufferedWriter;
     private BufferedReader bufferedReader;
     private int currentId = 0;
     private Map<String, Integer> nGramToId = new HashMap<>();
-    private Map<String, Map<String, Integer>> wordToNGrams = new HashMap<>();
-    List<Writer> WRITERS = new ArrayList<>();
-    int N;
 
-    public OneHotNgramVectors(String processedDatasetDir, int N) {
-        this.N = N;
-        this.processedDatasetDir = processedDatasetDir;
+    static Map<String, Map<String, Integer>> wordToNGramToId = new HashMap<>();
+
+    List<DatabaseWriter> WRITERS = new ArrayList<>();
+    int nGramSize;
+    public OneHotNgramVectors(@Value("${processed.data.dir}") String processedDataDir,
+                              @Value("${ngram.size}") int nGramSize,
+                              NaturalQuestionsDatabaseWriter naturalQuestionsDatabaseWriter,
+                              DuplicateQuestionsDatabaseWriter duplicateQuestionsDatabaseWriter,
+                              Rcv1ArticlesDatabaseWriter rcv1ArticlesDatabaseWriter) {
+        this.nGramSize = nGramSize;
+        this.processedDataDir = processedDataDir;
         WRITERS.addAll(Arrays.asList(
-                new QuoraWriter(PREPROCESSED_QUORA_DATA, PREPROCESSED_QUORA, N),
-                new NaturalQuestionsWriter(PREPROCESSED_NQ_DATA, PREPROCESSED_NQ, N),
-                new ReutersWriter(PREPROCESSED_REUTERS_DATA, PREPROCESSED_REUTERS, N)));
+                naturalQuestionsDatabaseWriter,
+                duplicateQuestionsDatabaseWriter,
+                rcv1ArticlesDatabaseWriter));
     }
 
-    public void createOneHotDatasets() {
-        try {
+    public void writeOneHotDatasetsToDatabase() {
+        constructNGramVocabulary(nGramSize);
 
-            constructNGramVocabulary(N);
-            writeNGramsToFile();
-            bufferedReader.close();
+        writeNGramsToFile();
 
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        }
-
-        writeOneHotRepresentations();
-
+        writeNGramRepresentations();
     }
 
     private void constructNGramVocabulary(int n) {
+
         getVocabulary().forEach(word -> {
-            if (!wordToNGrams.containsKey(word)) {
+            if (!wordToNGramToId.containsKey(word)) {
 
                 getNGrams(n, word)
                         .forEach(nGram -> {
@@ -80,26 +76,30 @@ public class OneHotNgramVectors {
 
                             }
 
-                            if (wordToNGrams.containsKey(word)) {
+                            if (wordToNGramToId.containsKey(word)) {
 
-                                wordToNGrams.get(word).put(nGram, nGramId);
+                                wordToNGramToId.get(word).put(nGram, nGramId);
 
                             } else {
 
                                 Map<String, Integer> nGramToId = new HashMap<>();
                                 nGramToId.put(nGram, nGramId);
-                                wordToNGrams.put(word, nGramToId);
+                                wordToNGramToId.put(word, nGramToId);
 
                             }
                         });
             }
         });
-
+        try {
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void writeNGramsToFile() {
         try {
-            bufferedWriter = new BufferedWriter(new FileWriter(processedDatasetDir + "/trigrams.txt"));
+            bufferedWriter = new BufferedWriter(new java.io.FileWriter(processedDataDir + "/trigrams.txt"));
             bufferedWriter.write("trigram id");
             bufferedWriter.newLine();
 
@@ -125,10 +125,10 @@ public class OneHotNgramVectors {
 
         try {
 
-            bufferedReader = new BufferedReader(new FileReader(processedDatasetDir + "/vocabulary.txt")); // TODO: Extract all file paths and have them only in one place for each path
+            bufferedReader = new BufferedReader(new FileReader(processedDataDir + "/vocabulary.txt")); // TODO: Extract all file paths and have them only in one place for each path
             return bufferedReader.lines().map(line -> line.split(" ")[0]);
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
 
             e.printStackTrace();
             return Stream.empty();
@@ -149,11 +149,13 @@ public class OneHotNgramVectors {
         return nGrams.stream();
     }
 
-    private void writeOneHotRepresentations() {
-        for (Writer writer : WRITERS) {
-            writer.write(wordToNGrams);
+    private void writeNGramRepresentations() {
+        for (DatabaseWriter writer : WRITERS) {
+            writer.write(wordToNGramToId);
         }
     }
 
-
+    public static Map<String, Map<String, Integer>> getWordToNGramToId() {
+        return wordToNGramToId;
+    }
 }

@@ -1,4 +1,4 @@
-package com.braincourt.preprocessing.preprocessors;
+package com.braincourt.preprocessing.filevisitors;
 
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
@@ -23,18 +23,18 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 
-public class ReutersPreProcessor extends PreProcessor {
+public class ReutersFileVisitor extends FileVisitor {
 
-    public ReutersPreProcessor(Tokenizer tokenizer) {
+    public ReutersFileVisitor(Tokenizer tokenizer) {
         super(tokenizer);
     }
 
 
     public Stream<DataObject> toDataObjects(Stream<Path> articlePaths) {
-        return articlePaths.map(this::toDataObjects);
+        return articlePaths.map(this::toDataObject);
     }
 
-    private ReutersDataObject toDataObjects(Path articlePath) {
+    private ReutersDataObject toDataObject(Path articlePath) {
         ReutersDataObject dataObject = new ReutersDataObject();
         try {
 

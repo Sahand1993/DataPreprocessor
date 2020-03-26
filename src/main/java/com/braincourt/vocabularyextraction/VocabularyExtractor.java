@@ -3,7 +3,10 @@ package com.braincourt.vocabularyextraction;
 import com.braincourt.vocabularyextraction.wordstreamers.NaturalQuestionsWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.QuoraWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.ReutersWordStreamer;
-import com.braincourt.vocabularyextraction.wordstreamers.WordStreamer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -17,21 +20,27 @@ import java.util.stream.Stream;
  * This class is responsible for writing the whole vocabulary of all data sets to a file on disk.
  * The file is at $THESIS_PROCESSED_DATA_DIR:vocabulary.txt, with one line per unique word
  */
+@Component
 public class VocabularyExtractor {
 
-    public static String preprocessedDataDir;
+    private static Logger LOG = LoggerFactory.getLogger(VocabularyExtractor.class);
 
-    Map<String, Integer> vocabulary;
+    public String preprocessedDataDir;
 
-    WordStreamer quoraWordStreamer;
-    WordStreamer reutersWordStreamer;
-    WordStreamer naturalQuestionsWordStreamer ;
+    private Map<String, Integer> vocabulary;
 
-    public VocabularyExtractor(String preprocessedDataDir) {
+    private QuoraWordStreamer quoraWordStreamer;
+    private ReutersWordStreamer reutersWordStreamer;
+    private NaturalQuestionsWordStreamer naturalQuestionsWordStreamer ;
+
+    public VocabularyExtractor(@Value("${processed.data.dir}") String preprocessedDataDir,
+                               QuoraWordStreamer quoraWordStreamer,
+                               ReutersWordStreamer reutersWordStreamer,
+                               NaturalQuestionsWordStreamer naturalQuestionStreamer) {
         this.preprocessedDataDir = preprocessedDataDir;
-        quoraWordStreamer = new QuoraWordStreamer();
-        reutersWordStreamer = new ReutersWordStreamer();
-        naturalQuestionsWordStreamer = new NaturalQuestionsWordStreamer();
+        this.quoraWordStreamer = quoraWordStreamer;
+        this.reutersWordStreamer = reutersWordStreamer;
+        this.naturalQuestionsWordStreamer = naturalQuestionStreamer;
     }
 
     public void writeVocabularyToFile() {
@@ -65,8 +74,8 @@ public class VocabularyExtractor {
                                                                        naturalQuestionsWordStreamer.getWordStream()))
                 .forEach(word -> {
                     if (i.get() % 2000000 == 0) {
-                        System.out.println(String.format("processing word %d: %s", i.get(), word));
-                        System.out.println(String.format("vocabulary size: %d\n", vocabulary.size()));
+                        LOG.info(String.format("processing word %d: %s", i.get(), word));
+                        LOG.info(String.format("vocabulary size: %d\n", vocabulary.size()));
 
                     }
                     vocabulary.put(word, vocabulary.containsKey(word) ? vocabulary.get(word) + 1 : 1);

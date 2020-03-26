@@ -25,7 +25,6 @@ public class NaturalQuestionsJsonPojo {
         return document_tokens;
     }
 
-
     public List<LongAnswerCandidate> getLongAnswerCandidates() {
         return long_answer_candidates;
     }

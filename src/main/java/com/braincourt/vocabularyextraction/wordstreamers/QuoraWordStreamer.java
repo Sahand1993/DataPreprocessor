@@ -1,16 +1,18 @@
 package com.braincourt.vocabularyextraction.wordstreamers;
 
-import com.braincourt.vocabularyextraction.VocabularyExtractor;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@Component
 public class QuoraWordStreamer extends WordStreamer {
 
-    public QuoraWordStreamer() {
-        this.jsonFilePath = VocabularyExtractor.preprocessedDataDir + "/quora/data.json";
+    public QuoraWordStreamer(@Value("${processed.data.dir}") String preprocessedDataDir) {
+        this.jsonFilePath = preprocessedDataDir + "/quora/data.json";
     }
 
     @Override
