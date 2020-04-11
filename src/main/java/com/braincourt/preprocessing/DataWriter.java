@@ -40,10 +40,11 @@ public class DataWriter {
                 String filePath = destinationDir + jsonFile;
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath));
 
-                LOG.info(String.format("Beginning processing of %s folder.", outputFolder));
+                LOG.info(String.format("Beginning writing to %s folder.", outputFolder));
 
                 dataObjects.forEach(dataObject -> { // TODO remove limit after debugging
                     writeTo(bufferedWriter, dataObject);
+
                     if (++processedFiles % 1000 == 0) {
                         LOG.info(String.format("wrote %d lines.", processedFiles));
                     }

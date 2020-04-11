@@ -1,11 +1,15 @@
 package com.braincourt.preprocessing.dataobjects;
 
 public class NaturalQuestionsToken {
-
     int start_byte;
     int end_byte;
-    Boolean html_token; // TODO: Consider removing
     String token;
+
+    public NaturalQuestionsToken(int start_byte, int end_byte, String token) {
+        this.start_byte = start_byte;
+        this.end_byte = end_byte;
+        this.token = token;
+    }
 
     public int getStartByte() {
         return start_byte;
@@ -13,10 +17,6 @@ public class NaturalQuestionsToken {
 
     public int getEndByte() {
         return end_byte;
-    }
-
-    public Boolean isHtmlToken() {
-        return html_token;
     }
 
     public String getToken() {

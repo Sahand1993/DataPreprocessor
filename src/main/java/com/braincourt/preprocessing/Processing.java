@@ -18,6 +18,8 @@ import java.util.stream.Stream;
 @Component
 public class Processing {
 
+    private final Tokenizer tokenizer;
+
     @Value("${reuters.raw.home}")
     String rawReutersDir;
 
@@ -26,9 +28,6 @@ public class Processing {
 
     @Value("${naturalQuestions.raw.home}")
     String rawNqDir;
-
-    @Value("${stopwords.file}")
-    String stopwordsFile;
 
     @Value("${naturalQuestions.home}")
     String preprocessedNqDir;
@@ -45,13 +44,13 @@ public class Processing {
     DataWriter dataWriter;
 
 
-    public Processing(DataWriter dataWriter) {
+    public Processing(DataWriter dataWriter,
+                      Tokenizer tokenizer) {
         this.dataWriter = dataWriter;
+        this.tokenizer = tokenizer;
     }
 
     public void preprocessDatasets() {
-        Tokenizer tokenizer = new Tokenizer(stopwordsFile);
-
         preprocessReuters(tokenizer);
 
         preprocessNaturalQuestions(tokenizer);

@@ -20,7 +20,10 @@ public class QuoraFileVisitor extends FileVisitor {
 
     @Override
     public Stream<DataObject> toDataObjects(Stream<Path> dataFilePaths) {
-        return dataFilePaths.flatMap(this::toDataObjects);
+        return dataFilePaths.flatMap(this::toDataObjects).filter(generalDataObject -> {
+            QuoraQuestionPairDataObject dataObject = (QuoraQuestionPairDataObject) generalDataObject;
+            return !dataObject.getQuestion1Tokens().isEmpty() && !dataObject.getQuestion2Tokens().isEmpty();
+        });
     }
 
     public Stream<DataObject> toDataObjects(Path dataFilePath) {

@@ -1,11 +1,14 @@
 package com.braincourt.preprocessing;
 
 import com.braincourt.preprocessing.dataobjects.NaturalQuestionsToken;
+import com.braincourt.preprocessing.dataobjects.NaturalQuestionsTokenWithHtml;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.awt.*;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,16 +19,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Component
 public class Tokenizer {
 
     private static final Set<String> END_PUNCTUATION = new HashSet<>(Arrays.asList("?", ".", "!"));
     Set<String> stopwords;
+    String stopwordsFileName;
     String dataDir;
 
     Pattern validTokenRegex = Pattern.compile("[\\p{IsLatin}&&[^_]]+"); // all unicode and numbers, no underscores
 
-    public Tokenizer(String dataDir) {
+    public Tokenizer(@Value("${dataDir}") String dataDir,
+                     @Value("${stopwords.fileName}") String stopwordsFileName) {
         this.dataDir = dataDir;
+        this.stopwordsFileName = stopwordsFileName;
         setStopWords();
         // TODO: Add stopwords from file
     }
@@ -33,11 +40,10 @@ public class Tokenizer {
     private void setStopWords() {
         stopwords = new HashSet<>();
         try {
-            String stopwordsPath = System.getenv("THESIS_DATA_DIR") + "/stopwords.json";
-            JSONObject json = (JSONObject) new JSONParser().parse(new FileReader(stopwordsPath));
-            List<String> stopwordList = (List<String>) json.get("words");
-            stopwords.addAll(stopwordList);
-        } catch (IOException | ParseException e) {
+            String stopwordsPath = dataDir + stopwordsFileName;
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(stopwordsPath));
+            bufferedReader.lines().forEach(stopWord -> stopwords.add(stopWord));
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -63,7 +69,7 @@ public class Tokenizer {
     }
 
     public List<NaturalQuestionsToken> filterNaturalQuestionTokens(Stream<NaturalQuestionsToken> tokens) {
-        return tokens// TODO: Remove end punctuation like in filterTokens() above
+        return tokens
                 .filter(token -> isValidToken(token.getToken()))
                 .map(token -> token.setToken(normalizeToken(token.getToken())))
                 .collect(Collectors.toList());

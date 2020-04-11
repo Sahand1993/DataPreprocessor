@@ -1,14 +1,14 @@
 package com.braincourt.preprocessing.jsonpojos;
 
 import com.braincourt.preprocessing.dataobjects.LongAnswerCandidate;
-import com.braincourt.preprocessing.dataobjects.NaturalQuestionsToken;
+import com.braincourt.preprocessing.dataobjects.NaturalQuestionsTokenWithHtml;
 
 import java.util.List;
 
 public class NaturalQuestionsJsonPojo {
 
     String document_title;
-    List<NaturalQuestionsToken> document_tokens;
+    List<NaturalQuestionsTokenWithHtml> document_tokens;
     List<LongAnswerCandidate> long_answer_candidates;
     String question_text;
     List<String> question_tokens;
@@ -21,7 +21,7 @@ public class NaturalQuestionsJsonPojo {
         this.document_title = document_title;
     }
 
-    public List<NaturalQuestionsToken> getDocumentTokens() {
+    public List<NaturalQuestionsTokenWithHtml> getDocumentTokens() {
         return document_tokens;
     }
 

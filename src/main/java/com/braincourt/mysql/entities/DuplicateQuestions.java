@@ -6,13 +6,18 @@ import javax.persistence.Lob;
 @Entity
 public class DuplicateQuestions extends DatabaseEntity {
 
-    @Lob
-    private String question1NGrams;
+    public int question1Id;
+
+    public int question2Id;
 
     @Lob
-    private String question2NGrams;
+    public String question1NGrams;
 
-    private Boolean isDuplicate;
+    @Lob
+    public String question2NGrams;
+
+    public Boolean isDuplicate;
+
 
     public String getQuestion1NGrams() {
         return question1NGrams;
@@ -36,5 +41,13 @@ public class DuplicateQuestions extends DatabaseEntity {
 
     public void setIsDuplicate(Boolean isDuplicate) {
         this.isDuplicate = isDuplicate;
+    }
+
+    public void setQuestion1Id(int question1Id) {
+        this.question1Id = question1Id;
+    }
+
+    public void setQuestion2Id(int question2Id) {
+        this.question2Id = question2Id;
     }
 }

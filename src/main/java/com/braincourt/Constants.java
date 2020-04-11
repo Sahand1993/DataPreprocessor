@@ -1,5 +1,7 @@
 package com.braincourt;
 
+import java.util.regex.Pattern;
+
 public class Constants {
 
     public static int N_GRAM_LENGTH = 3;
@@ -17,5 +19,7 @@ public class Constants {
 
     public static String PREPROCESSED_REUTERS = PREPROCESSED_DATA_PATH + "rcv1/";
     public static String PREPROCESSED_REUTERS_DATA = PREPROCESSED_DATA_PATH + "rcv1/data.json";
+
+    public static Pattern HAS_NUMBERS = Pattern.compile(".*\\d.*");
 
 }

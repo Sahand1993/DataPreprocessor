@@ -36,10 +36,10 @@ public class DataProcessing implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // TODO: Implement command line options for only processing certain datasets
 
-        processing.preprocessDatasets();
+        processing.preprocessDatasets(); // TODO
 
         vocabularyExtractor.writeVocabularyToFile();
 
-        oneHotNgramVectors.writeOneHotDatasetsToDatabase();
+        oneHotNgramVectors.writeOneHotDatasets();
     }
 }

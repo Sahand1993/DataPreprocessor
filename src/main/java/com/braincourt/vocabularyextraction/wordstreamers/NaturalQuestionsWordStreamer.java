@@ -11,8 +11,8 @@ import java.util.stream.StreamSupport;
 @Component
 public class NaturalQuestionsWordStreamer extends WordStreamer {
 
-    public NaturalQuestionsWordStreamer(@Value("${processed.data.dir}") String preprocessedDataDir) {
-        this.jsonFilePath = preprocessedDataDir + "/nq/data.json";
+    public NaturalQuestionsWordStreamer(@Value("${naturalQuestions.home}") String preprocessedDataDir) {
+        this.jsonFilePath = preprocessedDataDir + "/data.json";
     }
 
     @Override

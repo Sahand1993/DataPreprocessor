@@ -4,6 +4,7 @@ import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
 import com.braincourt.preprocessing.dataobjects.NaturalQuestionsDataObject;
 import com.braincourt.preprocessing.dataobjects.NaturalQuestionsToken;
+import com.braincourt.preprocessing.dataobjects.NaturalQuestionsTokenWithHtml;
 import com.braincourt.preprocessing.jsonpojos.NaturalQuestionsJsonPojo;
 import com.google.gson.Gson;
 
@@ -52,10 +53,11 @@ public class NaturalQuestionsFileVisitor extends FileVisitor {
 
         nqDataObject.setDocumentTitle(naturalQuestionsJsonPojo.getDocumentTitle());
 
-        List<NaturalQuestionsToken> tokens = naturalQuestionsJsonPojo.getDocumentTokens();
+        List<NaturalQuestionsTokenWithHtml> tokens = naturalQuestionsJsonPojo.getDocumentTokens();
         nqDataObject.setDocumentTokens(
                 tokenizer.filterNaturalQuestionTokens(tokens.stream()
-                        .filter(token -> !token.isHtmlToken())) // TODO: consider adding another map-clause where NaturalQuestionsToken is transformed to new object NaturalQuestionsTokenLight that doesn't have the html_token boolean
+                        .filter(token -> !token.isHtmlToken())
+                        .map(token -> new NaturalQuestionsToken(token.getStartByte(), token.getEndByte(), token.getToken())))// TODO: consider adding another map-clause where NaturalQuestionsTokenWithHtml is transformed to new object NaturalQuestionsTokenLight that doesn't have the html_token boolean
         );
 
         List<String> questionTokens = naturalQuestionsJsonPojo.getQuestionTokens();

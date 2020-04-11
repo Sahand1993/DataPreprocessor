@@ -7,10 +7,10 @@ import javax.persistence.Lob;
 public class NaturalQuestions extends DatabaseEntity {
 
     @Lob
-    private String questionNGrams;
+    public String questionNGrams;
 
     @Lob
-    private String documentNGrams;
+    public String documentNGrams;
 
     public String getQuestionNGrams() {
         return questionNGrams;
@@ -27,5 +27,4 @@ public class NaturalQuestions extends DatabaseEntity {
     public void setDocumentNGrams(String documentNGrams) {
         this.documentNGrams = documentNGrams;
     }
-
 }

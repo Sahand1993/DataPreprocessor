@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -32,8 +33,10 @@ public class VocabularyExtractor {
     private QuoraWordStreamer quoraWordStreamer;
     private ReutersWordStreamer reutersWordStreamer;
     private NaturalQuestionsWordStreamer naturalQuestionsWordStreamer ;
+    private int wordFrequencyRequirement;
 
     public VocabularyExtractor(@Value("${processed.data.dir}") String preprocessedDataDir,
+                               @Value("${vocabulary.remove.words.fewer.than}") int wordFrequencyRequirement,
                                QuoraWordStreamer quoraWordStreamer,
                                ReutersWordStreamer reutersWordStreamer,
                                NaturalQuestionsWordStreamer naturalQuestionStreamer) {
@@ -41,10 +44,12 @@ public class VocabularyExtractor {
         this.quoraWordStreamer = quoraWordStreamer;
         this.reutersWordStreamer = reutersWordStreamer;
         this.naturalQuestionsWordStreamer = naturalQuestionStreamer;
+        this.wordFrequencyRequirement = wordFrequencyRequirement;
     }
 
     public void writeVocabularyToFile() {
         extractVocabulary();
+        filterVocabulary();
         try {
 
             BufferedWriter bufferedWriter = new BufferedWriter(
@@ -65,6 +70,12 @@ public class VocabularyExtractor {
         }
     }
 
+    private void filterVocabulary() {
+        vocabulary = vocabulary.entrySet().stream()
+                .filter(entry -> entry.getValue() > wordFrequencyRequirement)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private void extractVocabulary() {
         vocabulary = new HashMap<>();
         AtomicInteger i = new AtomicInteger();
@@ -76,7 +87,6 @@ public class VocabularyExtractor {
                     if (i.get() % 2000000 == 0) {
                         LOG.info(String.format("processing word %d: %s", i.get(), word));
                         LOG.info(String.format("vocabulary size: %d\n", vocabulary.size()));
-
                     }
                     vocabulary.put(word, vocabulary.containsKey(word) ? vocabulary.get(word) + 1 : 1);
                     i.getAndIncrement();
