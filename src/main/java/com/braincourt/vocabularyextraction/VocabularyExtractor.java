@@ -43,7 +43,6 @@ public class VocabularyExtractor {
                                @Value("${vocabulary.remove.words.fewer.than}") int wordFrequencyRequirement,
                                QuoraWordStreamer quoraWordStreamer,
                                ReutersWordStreamer reutersWordStreamer,
-                               //NaturalQuestionsDocumentWordStreamer naturalQuestionsDocumentWordStreamer
                                NaturalQuestionsTitleWordStreamer naturalQuestionsTitleWordStreamer,
                                NaturalQuestionsDocumentWordStreamer naturalQuestionsDocumentWordStreamer,
                                SquadWordStreamer squadWordStreamer,

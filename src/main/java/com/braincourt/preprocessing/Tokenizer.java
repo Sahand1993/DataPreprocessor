@@ -20,22 +20,20 @@ public class Tokenizer {
 
     private static final Set<String> END_PUNCTUATION = new HashSet<>(Arrays.asList("?", ".", "!"));
     Set<String> stopwords;
-    String stopwordsFileName;
+    String stopwordsPath;
     String dataDir;
 
     Pattern validTokenRegex = Pattern.compile("[\\p{IsLatin}&&[^_]]+('[\\p{IsLatin}&&[^_]]*)?");
 
-    public Tokenizer(@Value("${dataDir}") String dataDir,
-                     @Value("${stopwords.fileName}") String stopwordsFileName) {
+    public Tokenizer(@Value("${stopwords.path}") String stopwordsPath) {
         this.dataDir = dataDir;
-        this.stopwordsFileName = stopwordsFileName;
+        this.stopwordsPath = stopwordsPath;
         setStopWords();
     }
 
     private void setStopWords() {
         stopwords = new HashSet<>();
         try {
-            String stopwordsPath = dataDir + stopwordsFileName;
             BufferedReader bufferedReader = new BufferedReader(new FileReader(stopwordsPath));
             bufferedReader.lines().forEach(stopWord -> stopwords.add(stopWord));
         } catch (IOException e) {
