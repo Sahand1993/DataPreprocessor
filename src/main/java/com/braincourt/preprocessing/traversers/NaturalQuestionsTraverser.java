@@ -1,14 +1,18 @@
 package com.braincourt.preprocessing.traversers;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+@Component
 public class NaturalQuestionsTraverser extends Traverser {
 
-    public NaturalQuestionsTraverser(Path datasetRoot) {
+    public NaturalQuestionsTraverser(@Value("${naturalQuestions.raw.home}") String datasetRoot) {
         super(datasetRoot);
     }
 

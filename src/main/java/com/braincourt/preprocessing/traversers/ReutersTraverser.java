@@ -1,18 +1,22 @@
 package com.braincourt.preprocessing.traversers;
 
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Component
 public class ReutersTraverser extends Traverser {
 
     private static final Set<String> NON_DATA_DIRNAMES
             = new HashSet<>(Arrays.asList("codes", "dtds"));
 
-    public ReutersTraverser(Path reutersDataRoot) {
-        super(reutersDataRoot);
+    public ReutersTraverser(@Value("${reuters.raw.home}") String datasetRoot) {
+        super(datasetRoot);
     }
 
     @Override

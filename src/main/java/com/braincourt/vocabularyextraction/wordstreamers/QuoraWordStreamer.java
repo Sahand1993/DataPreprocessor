@@ -11,8 +11,10 @@ import java.util.stream.StreamSupport;
 @Component
 public class QuoraWordStreamer extends WordStreamer {
 
-    public QuoraWordStreamer(@Value("${quora.home}") String preprocessedDataDir) {
-        this.jsonFilePath = preprocessedDataDir + "/data.json";
+    public QuoraWordStreamer(@Value("${processed.data.dir}") String preprocessedDataDir,
+                             @Value("${quora.folder}") String quoraFolderName,
+                             @Value("${filename.json}") String midJsonFileName) {
+        this.jsonFilePath = preprocessedDataDir + quoraFolderName + midJsonFileName;
     }
 
     @Override

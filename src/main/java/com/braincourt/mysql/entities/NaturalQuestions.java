@@ -1,30 +1,97 @@
 package com.braincourt.mysql.entities;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Lob;
 
 @Entity
 public class NaturalQuestions extends DatabaseEntity {
 
+    @Id
+    public Long id;
+
+    public String exampleId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public NaturalQuestions setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public String titleNGramIndices;
+
+    public String titleWordIndices;
+
     @Lob
-    public String questionNGrams;
+    public String questionNGramIndices;
 
     @Lob
-    public String documentNGrams;
+    public String documentNGramIndices;
 
-    public String getQuestionNGrams() {
-        return questionNGrams;
+    public String questionWordIndices;
+
+    @Lob
+    public String documentWordIndices;
+
+    public String getTitleNGramIndices() {
+        return titleNGramIndices;
     }
 
-    public void setQuestionNGrams(String questionNGrams) {
-        this.questionNGrams = questionNGrams;
+    public NaturalQuestions setTitleNGramIndices(String titleNGramIndices) {
+        this.titleNGramIndices = titleNGramIndices;
+        return this;
     }
 
-    public String getDocumentNGrams() {
-        return documentNGrams;
+    public String getTitleWordIndices() {
+        return titleWordIndices;
     }
 
-    public void setDocumentNGrams(String documentNGrams) {
-        this.documentNGrams = documentNGrams;
+    public NaturalQuestions setTitleWordIndices(String titleWordIndices) {
+        this.titleWordIndices = titleWordIndices;
+        return this;
+    }
+
+    public String getQuestionWordIndices() {
+        return questionWordIndices;
+    }
+
+    public NaturalQuestions setQuestionWordIndices(String questionWordIndices) {
+        this.questionWordIndices = questionWordIndices;
+        return this;
+    }
+
+    public String getDocumentWordIndices() {
+        return documentWordIndices;
+    }
+
+    public NaturalQuestions setDocumentWordIndices(String documentWordIndices) {
+        this.documentWordIndices = documentWordIndices;
+        return this;
+    }
+
+    public String getQuestionNGramIndices() {
+        return questionNGramIndices;
+    }
+
+    public NaturalQuestions setQuestionNGramIndices(String questionNGramIndices) {
+        this.questionNGramIndices = questionNGramIndices;
+        return this;
+    }
+
+    public String getDocumentNGramIndices() {
+        return documentNGramIndices;
+    }
+
+    public NaturalQuestions setDocumentNGramIndices(String documentNGramIndices) {
+        this.documentNGramIndices = documentNGramIndices;
+        return this;
+    }
+
+    public NaturalQuestions setExampleId(String exampleId) {
+        this.exampleId = exampleId;
+        return this;
     }
 }

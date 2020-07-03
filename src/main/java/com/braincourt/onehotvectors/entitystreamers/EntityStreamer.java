@@ -16,16 +16,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
-/**
- * Responsible for writing onehot representations to the right file on disk
- */
 public abstract class EntityStreamer<T extends DatabaseEntity> {
 
     Logger LOG = LoggerFactory.getLogger(this.getClass());
@@ -35,6 +32,8 @@ public abstract class EntityStreamer<T extends DatabaseEntity> {
 
     protected String jsonDataPath;
 
+    private BufferedReader bufferedReader;
+
     public EntityStreamer(String jsonDataPath,
                           String csvDelimiter,
                           String indicesDelimiter) {
@@ -42,8 +41,6 @@ public abstract class EntityStreamer<T extends DatabaseEntity> {
         this.indicesDelimiter = indicesDelimiter;
         this.csvDelimiter = csvDelimiter;
     }
-
-    private BufferedReader bufferedReader;
 
     public Stream<T> getEntities() {
         try {
@@ -65,35 +62,46 @@ public abstract class EntityStreamer<T extends DatabaseEntity> {
 
     public abstract List<T> createEntities(JsonObject dataRow);
 
-    protected SortedSet<String> getNGramIndices(List<String> tokens) {
-        SortedSet<String> nGramIds = new TreeSet<>();
-        Map<String, Map<String, Integer>> wordToNGramsWithIds = OneHotNgramVectors.getWordsToNGramsWithIds();
-        for (int i = 0; i < tokens.size(); i++) {
+    protected SortedMap<String, Integer> getNGramIndicesWithFreqs(List<String> tokens) {
+        SortedMap<String, Integer> nGramsWithFreqs = new TreeMap<>();
+        Map<String, Map<Integer, Integer>> wordToNGramToIdToFreq = OneHotNgramVectors.getWordsToNGramIdsToFreqs();
+        for (String token : tokens) {
 
-            String token = tokens.get(i);
-            Map<String, Integer> nGramsWithIds = wordToNGramsWithIds.get(token);
-            if (nGramsWithIds != null) {
-                Collection<Integer> tokenNGramIds = nGramsWithIds.values();
-                tokenNGramIds.stream()
-                        .map(Object::toString)
-                        .forEach(nGramIds::add);
-            }
+            Map<Integer, Integer> tokenNGramToFreq = Objects.requireNonNull(wordToNGramToIdToFreq.get(token));
+//            Collection<Integer> tokenNGramIds = tokenNGramToFreq.values();
+//            tokenNGramIds.stream()
+//                    .map(Object::toString)
+//                    .forEach(nGramId -> nGramsWithFreqs.merge(nGramId, 1, Integer::sum));
+            tokenNGramToFreq.entrySet().forEach(entry -> {
+
+                    String nGramId = entry.getKey().toString();
+                    Integer freq = entry.getValue();
+
+                    if (nGramsWithFreqs.containsKey(nGramId)) {
+
+                        nGramsWithFreqs.put(nGramId, nGramsWithFreqs.get(nGramId) + freq);
+
+                    } else {
+
+                        nGramsWithFreqs.put(nGramId, freq);
+
+                    }
+            });
         }
 
-        return nGramIds;
+        return nGramsWithFreqs;
     }
 
-    protected SortedSet<String> getWordIndices(List<String> tokens) {
-        SortedSet<String> wordIds = new TreeSet<>();
+    protected SortedMap<String, Integer> getWordIndicesWithFreqs(List<String> tokens) {
+        SortedMap<String, Integer> wordIds = new TreeMap<>();
         Map<String, String> vocabulary = OneHotNgramVectors.getVocabulary();
         tokens.stream()
-                .map(token -> vocabulary.getOrDefault(token, null))
-                .filter(Objects::nonNull)
-                .forEach(wordIds::add);
+                .map(vocabulary::get)
+                .forEach(wordId -> wordIds.merge(wordId, 1, Integer::sum));
         return wordIds;
     }
 
-    protected List<JsonElement> getAsList(JsonArray json) {
+    protected static List<JsonElement> getAsList(JsonArray json) {
         return StreamSupport.stream(json.spliterator(), false).collect(Collectors.toList());
     }
 
@@ -104,18 +112,28 @@ public abstract class EntityStreamer<T extends DatabaseEntity> {
     }
 
     protected String getNgramIndices(JsonObject dataRow, String key) {
-        List<String> documentTokens = getAslist(dataRow, key);
+        List<String> tokens = getAslist(dataRow, key);
 
-        SortedSet<String> wordIds = getNGramIndices(documentTokens);
+        SortedMap<String, Integer> nGramIdsToFreqs = getNGramIndicesWithFreqs(tokens);
 
-        return String.join(indicesDelimiter, wordIds);
+        return joinIdsWithFreqs(nGramIdsToFreqs);
     }
 
-    protected String getWordIndices(JsonObject dataRow, String key) {
+
+    protected String joinIdsWithFreqs(SortedMap<String, Integer> idsWithFreqs) {
+        return String.join(
+                indicesDelimiter,
+                idsWithFreqs.entrySet().stream()
+                        .map(stringIntegerEntry
+                                -> String.format("%d %s", stringIntegerEntry.getValue(), stringIntegerEntry.getKey()))
+                        .collect(Collectors.toList()));
+    }
+
+    protected String getWordIndicesWithFreqs(JsonObject dataRow, String key) {
         List<String> documentTokens = getAslist(dataRow, key);
 
-        SortedSet<String> wordIds = getWordIndices(documentTokens);
+        SortedMap<String, Integer> wordIds = getWordIndicesWithFreqs(documentTokens);
 
-        return String.join(indicesDelimiter, wordIds);
+        return joinIdsWithFreqs(wordIds);
     }
 }

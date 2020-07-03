@@ -5,9 +5,9 @@ import java.util.stream.Stream;
 
 public abstract class Traverser {
 
-    Path datasetRoot;
+    String datasetRoot;
 
-    public Traverser(Path datasetRoot) {
+    public Traverser(String datasetRoot) {
         this.datasetRoot = datasetRoot;
     }
 

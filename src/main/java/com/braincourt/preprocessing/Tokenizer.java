@@ -1,10 +1,6 @@
 package com.braincourt.preprocessing;
 
 import com.braincourt.preprocessing.dataobjects.NaturalQuestionsToken;
-import com.braincourt.preprocessing.dataobjects.NaturalQuestionsTokenWithHtml;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +23,13 @@ public class Tokenizer {
     String stopwordsFileName;
     String dataDir;
 
-    Pattern validTokenRegex = Pattern.compile("[\\p{IsLatin}&&[^_]]+"); // all unicode and numbers, no underscores
+    Pattern validTokenRegex = Pattern.compile("[\\p{IsLatin}&&[^_]]+('[\\p{IsLatin}&&[^_]]*)?");
 
     public Tokenizer(@Value("${dataDir}") String dataDir,
                      @Value("${stopwords.fileName}") String stopwordsFileName) {
         this.dataDir = dataDir;
         this.stopwordsFileName = stopwordsFileName;
         setStopWords();
-        // TODO: Add stopwords from file
     }
 
     private void setStopWords() {
@@ -50,15 +45,44 @@ public class Tokenizer {
 
     // This class will stem the words. Takes in a list of words, returns a list of tokens (stemmed, stop words removed)
     public List<String> tokenize(String line) {
-        return filterTokens(Arrays.stream(line.split(" ")));
+        return processTokens(Arrays.stream(line.split(" ")));
     }
 
-    public List<String> filterTokens(Stream<String> tokens) {
+    public List<String> processTokens(List<String> tokens) {
+        return processTokens(tokens.stream());
+    }
+
+    public List<String> processTokens(Stream<String> tokens) {
         return tokens
                 .map(this::removeEndPunctuation)
+                .map(String::toLowerCase)
+                .map(this::stem)
                 .filter(this::isValidToken)
-                .map(this::normalizeToken)
+                .flatMap(this::splitOnApostrophe)
                 .collect(Collectors.toList());
+    }
+
+    public List<String> processNaturalQuestionsTokens(Stream<NaturalQuestionsToken> tokens) {
+        return processTokens(tokens.map(NaturalQuestionsToken::getToken));
+    }
+
+    private Stream<String> splitOnApostrophe(String token) {
+        if (token.contains("'")) {
+            String[] tokens = token.split("'");
+            if (tokens.length == 1) {
+                return Stream.of(tokens[0]);
+            }
+            if (tokens[1].equals("s")) {
+                return Stream.of(tokens[0]);
+            }
+            return Stream.of(tokens[0], "'" + tokens[1]);
+        } else {
+            return Stream.of(token);
+        }
+    }
+
+    public List<String> processTokens(String token) {
+        return processTokens(Arrays.stream(token.split(" ")));
     }
 
     private String removeEndPunctuation(String token) {
@@ -68,19 +92,8 @@ public class Tokenizer {
         return token;
     }
 
-    public List<NaturalQuestionsToken> filterNaturalQuestionTokens(Stream<NaturalQuestionsToken> tokens) {
-        return tokens
-                .filter(token -> isValidToken(token.getToken()))
-                .map(token -> token.setToken(normalizeToken(token.getToken())))
-                .collect(Collectors.toList());
-    }
-
     private Boolean isValidToken(String token) {
         return !isStopWord(token) && hasValidRegex(token);
-    }
-
-    private String normalizeToken(String token) {
-        return stem(token.toLowerCase().trim());
     }
 
     private boolean hasValidRegex(String token) {
@@ -88,10 +101,13 @@ public class Tokenizer {
     }
 
     private String stem(String token) {
+        if (token.endsWith("'")) {
+            return token.substring(0, token.length() - 1);
+        }
         return token;
     }
 
     private boolean isStopWord(String word) {
-        return stopwords.contains(word);
+        return stopwords.contains(word.toLowerCase());
     }
 }

@@ -11,10 +11,24 @@ import static com.braincourt.Constants.HAS_NUMBERS;
 @Entity
 public class RcvArticlesWithTopicTags extends RcvArticles {
 
+    @Id
+    public Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public int articleId;
 
     @Lob
-    public String queryArticleIndices; // Can be either ngram och vocabulary indices
+    public String queryArticleNGramIndices; // Can be either ngram och vocabulary indices
+
+    @Lob
+    public String queryArticleWordIndices;
 
     public Long relevantId;
 
@@ -88,9 +102,11 @@ public class RcvArticlesWithTopicTags extends RcvArticles {
     public boolean meur;
 
     public RcvArticlesWithTopicTags(int articleId,
-                                    String articleIndices) {
+                                    String articleNGramIndices,
+                                    String articleWordIndices) {
         this.articleId = articleId;
-        this.queryArticleIndices = articleIndices;
+        this.queryArticleNGramIndices = articleNGramIndices;
+        this.queryArticleWordIndices = articleWordIndices;
     }
 
     public void setRelevantId(Long relevantId) {

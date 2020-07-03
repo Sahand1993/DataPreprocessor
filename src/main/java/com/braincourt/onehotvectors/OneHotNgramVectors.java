@@ -1,22 +1,27 @@
 package com.braincourt.onehotvectors;
 
+import com.braincourt.datasetdividers.Dividing;
 import com.braincourt.onehotvectors.writers.Writer;
-import com.braincourt.onehotvectors.writers.database.ngram.DuplicateQuestionsDatabaseWriter;
-import com.braincourt.onehotvectors.writers.database.ngram.NaturalQuestionsDatabaseWriter;
-import com.braincourt.onehotvectors.writers.database.ngram.Rcv1ArticlesDatabaseWriter;
-import com.braincourt.onehotvectors.writers.file.ngram.NaturalQuestionsNgramIndicesFileWriter;
-import com.braincourt.onehotvectors.writers.file.ngram.DuplicateQuestionsNgramIndicesFileWriter;
-import com.braincourt.onehotvectors.writers.file.ngram.Rcv1ArticlesNgramIndicesFileWriter;
-import com.braincourt.onehotvectors.writers.file.wordindices.DuplicateQuestionsWordIndicesFileWriter;
-import com.braincourt.onehotvectors.writers.file.wordindices.NaturalQuestionsWordIndicesFileWriter;
-import com.braincourt.onehotvectors.writers.file.wordindices.Rcv1ArticlesVocabularyFileWriter;
+import com.braincourt.onehotvectors.writers.database.Rcv1ArticlesDatabaseWriter;
+import com.braincourt.onehotvectors.writers.file.DuplicateQuestionsIndicesFileWriter;
+import com.braincourt.onehotvectors.writers.file.NaturalQuestionsAllIndicesFileWriter;
+import com.braincourt.onehotvectors.writers.file.NaturalQuestionsTitleIndicesFileWriter;
+import com.braincourt.onehotvectors.writers.file.Rcv1ArticlesIndicesFileWriter;
+import com.braincourt.onehotvectors.writers.file.SquadIndicesFileWriter;
+import com.braincourt.onehotvectors.writers.file.WikiQAIndicesFileWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,7 +42,7 @@ public class OneHotNgramVectors {
     private int currentId = 0;
     private Map<String, Integer> nGramToId = new HashMap<>();
 
-    static Map<String, Map<String, Integer>> wordsToNGramsWithIds = new HashMap<>();
+    static Map<String, Map<Integer, Integer>> wordsToNGramIdsToFreqs = new HashMap<>();
 
     static Map<String, String> vocabulary = new HashMap<>();
 
@@ -45,75 +50,109 @@ public class OneHotNgramVectors {
 
     int nGramSize;
 
+    Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+    Dividing dividing;
+
     public OneHotNgramVectors(@Value("${processed.data.dir}") String processedDataDir,
                               @Value("${ngram.size}") int nGramSize,
-                              DuplicateQuestionsNgramIndicesFileWriter duplicateQuestionsNgramIndicesFileWriter,
-                              NaturalQuestionsNgramIndicesFileWriter naturalQuestionsNgramIndicesFileWriter,
-                              Rcv1ArticlesNgramIndicesFileWriter rcv1ArticlesNgramFileWriter,
 
-                              NaturalQuestionsDatabaseWriter naturalQuestionsDatabaseWriter,
-                              DuplicateQuestionsDatabaseWriter duplicateQuestionsDatabaseWriter,
+                              Dividing dividing,
                               Rcv1ArticlesDatabaseWriter rcv1ArticlesDatabaseWriter,
-
-                              DuplicateQuestionsWordIndicesFileWriter duplicateQuestionsWordIndicesFileWriter,
-                              NaturalQuestionsWordIndicesFileWriter naturalQuestionsWordIndicesFileWriter,
-                              Rcv1ArticlesVocabularyFileWriter rcv1ArticlesVocabularyFileWriter) {
+                              DuplicateQuestionsIndicesFileWriter duplicateQuestionsIndicesFileWriter,
+                              NaturalQuestionsAllIndicesFileWriter naturalQuestionsAllIndicesFileWriter,
+                              Rcv1ArticlesIndicesFileWriter rcv1ArticlesIndicesFileWriter,
+                              SquadIndicesFileWriter squadIndicesFileWriter,
+                              WikiQAIndicesFileWriter wikiQAIndicesFileWriter) {
         this.nGramSize = nGramSize;
         this.processedDataDir = processedDataDir;
+        this.dividing = dividing;
         WRITERS.addAll(Arrays.asList(
-                duplicateQuestionsNgramIndicesFileWriter,
-                naturalQuestionsNgramIndicesFileWriter,
-                rcv1ArticlesNgramFileWriter,
-                naturalQuestionsDatabaseWriter,
-                duplicateQuestionsDatabaseWriter,
+                wikiQAIndicesFileWriter,
+                squadIndicesFileWriter,
+                duplicateQuestionsIndicesFileWriter,
+                naturalQuestionsAllIndicesFileWriter,
                 rcv1ArticlesDatabaseWriter,
-                duplicateQuestionsWordIndicesFileWriter,
-                naturalQuestionsWordIndicesFileWriter,
-                rcv1ArticlesVocabularyFileWriter));
+                rcv1ArticlesIndicesFileWriter
+                ));
     }
 
     public void writeOneHotDatasets() {
+        LOG.info("Constructing vocabulary.");
+        constructVocabulary();
+
+        LOG.info("Constructing ngram vocabulary.");
         constructNGramVocabulary(nGramSize);
 
+        LOG.info("Writing ngrams to file.");
         writeNGramsToFile();
+
+    //    LOG.info("Dividing datasets.");
+    //    dividing.divideAll();
 
         write();
     }
 
     private void constructNGramVocabulary(int n) {
-        constructVocabulary();
-        vocabulary.keySet().forEach(word -> {
-            if (!wordsToNGramsWithIds.containsKey(word)) {
+        try {
+            ObjectInputStream wordsToNGramsWithIdsIn = new ObjectInputStream(new FileInputStream(processedDataDir + "/wordsToNGramIdsToFreqs.ser"));
+            ObjectInputStream nGramToIdIn = new ObjectInputStream(new FileInputStream(processedDataDir + "/nGramToId.ser"));
+            wordsToNGramIdsToFreqs = (Map<String, Map<Integer, Integer>>) wordsToNGramsWithIdsIn.readObject();
+            nGramToId = (Map<String, Integer>) nGramToIdIn.readObject();
+            LOG.info("wordToNGramsWithIds and nGramsToId found and loaded");
+        } catch (IOException | ClassNotFoundException e) {
+            LOG.info("Could not find ngram indices, indexing...");
+            vocabulary.keySet().forEach(word -> {
+                if (!wordsToNGramIdsToFreqs.containsKey(word)) {
 
-                getNGrams(n, word)
-                        .forEach(nGram -> {
+                    getNGrams(n, word)
+                            .forEach(nGram -> {
 
-                            int nGramId;
-                            if (!nGramToId.containsKey(nGram)) {
+                                int nGramId;
+                                if (!nGramToId.containsKey(nGram)) {
 
-                                nGramToId.put(nGram, currentId);
-                                nGramId = currentId++;
+                                    nGramToId.put(nGram, currentId);
+                                    nGramId = currentId++;
 
-                            } else {
+                                } else {
 
-                                nGramId = nGramToId.get(nGram);
+                                    nGramId = nGramToId.get(nGram);
 
-                            }
+                                }
 
-                            if (wordsToNGramsWithIds.containsKey(word)) {
+                                if (wordsToNGramIdsToFreqs.containsKey(word)) {
 
-                                wordsToNGramsWithIds.get(word).put(nGram, nGramId);
+                                    Map<Integer, Integer> nGramIdsToFreqs = wordsToNGramIdsToFreqs.get(word);
+                                    if (nGramIdsToFreqs.containsKey(nGramId)) {
 
-                            } else {
+                                        nGramIdsToFreqs.put(nGramId, nGramIdsToFreqs.get(nGramId) + 1);
 
-                                Map<String, Integer> nGramToId = new HashMap<>();
-                                nGramToId.put(nGram, nGramId);
-                                wordsToNGramsWithIds.put(word, nGramToId);
+                                    } else {
 
-                            }
-                        });
+                                        nGramIdsToFreqs.put(nGramId, 1);
+
+                                    }
+
+                                } else {
+
+                                    Map<Integer, Integer> nGramIdToFreq = new HashMap<>();
+                                    nGramIdToFreq.put(nGramId, 1);
+                                    wordsToNGramIdsToFreqs.put(word, nGramIdToFreq);
+
+                                }
+                            });
+                }
+            });
+            try {
+                LOG.info("Serializing wordsToNGramIdsToFreqs and nGramsToId.");
+                ObjectOutputStream wordsToNGramsWithIdsOut = new ObjectOutputStream(new FileOutputStream(processedDataDir + "/wordsToNGramIdsToFreqs.ser"));
+                ObjectOutputStream nGramToIdOut = new ObjectOutputStream(new FileOutputStream(processedDataDir + "/nGramToId.ser"));
+                wordsToNGramsWithIdsOut.writeObject(wordsToNGramIdsToFreqs);
+                nGramToIdOut.writeObject(nGramToId);
+            } catch (IOException e2) {
+                e2.printStackTrace();
             }
-        });
+        }
         try {
             bufferedReader.close();
         } catch (IOException e) {
@@ -152,7 +191,7 @@ public class OneHotNgramVectors {
             bufferedReader = new BufferedReader(new FileReader(processedDataDir + "/vocabulary.txt")); // TODO: Extract all file paths and have them only in one place for each path
             bufferedReader.lines().forEach(line -> {
                 String[] wordAndId = line.split(" ");
-                vocabulary.put(wordAndId[0], wordAndId[1]);
+                vocabulary.put(wordAndId[1], wordAndId[0]);
             });
 
         } catch (IOException e) {
@@ -181,8 +220,8 @@ public class OneHotNgramVectors {
         }
     }
 
-    public static Map<String, Map<String, Integer>> getWordsToNGramsWithIds() {
-        return wordsToNGramsWithIds;
+    public static Map<String, Map<Integer, Integer>> getWordsToNGramIdsToFreqs() {
+        return wordsToNGramIdsToFreqs;
     }
 
     public static Map<String, String> getVocabulary() {

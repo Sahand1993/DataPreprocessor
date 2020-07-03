@@ -4,6 +4,7 @@ import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.DataObject;
 import com.braincourt.preprocessing.dataobjects.QuoraQuestionPairDataObject;
 import com.opencsv.CSVParser;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+@Component
 public class QuoraFileVisitor extends FileVisitor {
 
     public QuoraFileVisitor(Tokenizer tokenizer) {

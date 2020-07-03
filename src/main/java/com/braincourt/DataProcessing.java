@@ -1,5 +1,6 @@
 package com.braincourt;
 
+import com.braincourt.datasetdividers.Dividing;
 import com.braincourt.onehotvectors.OneHotNgramVectors;
 import com.braincourt.preprocessing.Processing;
 import com.braincourt.vocabularyextraction.VocabularyExtractor;
@@ -16,13 +17,16 @@ public class DataProcessing implements CommandLineRunner {
     OneHotNgramVectors oneHotNgramVectors;
     VocabularyExtractor vocabularyExtractor;
     Processing processing;
+    Dividing dividing;
 
     public DataProcessing(OneHotNgramVectors oneHotNgramVectors,
                           VocabularyExtractor vocabularyExtractor,
-                          Processing processing) {
+                          Processing processing,
+                          Dividing dividing) {
         this.oneHotNgramVectors = oneHotNgramVectors;
         this.vocabularyExtractor = vocabularyExtractor;
         this.processing = processing;
+        this.dividing = dividing;
     }
 
     private static Logger LOG = LoggerFactory
@@ -34,11 +38,9 @@ public class DataProcessing implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // TODO: Implement command line options for only processing certain datasets
+        processing.preprocessDatasets();
 
-        processing.preprocessDatasets(); // TODO
-
-        vocabularyExtractor.writeVocabularyToFile();
+        vocabularyExtractor.createVocabulary();
 
         oneHotNgramVectors.writeOneHotDatasets();
     }

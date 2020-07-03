@@ -11,8 +11,10 @@ import java.util.stream.StreamSupport;
 @Component
 public class ReutersWordStreamer extends WordStreamer {
 
-    public ReutersWordStreamer(@Value("${reuters.home}") String preprocessedDataDir) {
-        this.jsonFilePath = preprocessedDataDir + "/data.json";
+    public ReutersWordStreamer(@Value("${reuters.folder}") String reutersFolderName,
+                               @Value("${processed.data.dir}") String preprocessedDataDir,
+                               @Value("${filename.json}") String midJsonFileName) {
+        this.jsonFilePath = preprocessedDataDir + reutersFolderName + midJsonFileName;
     }
 
     @Override

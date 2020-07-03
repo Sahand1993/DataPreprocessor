@@ -1,8 +1,12 @@
 package com.braincourt.vocabularyextraction;
 
-import com.braincourt.vocabularyextraction.wordstreamers.NaturalQuestionsWordStreamer;
+import com.braincourt.vocabularyextraction.wordstreamers.NaturalQuestionsDocumentWordStreamer;
+import com.braincourt.vocabularyextraction.wordstreamers.NaturalQuestionsTitleWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.QuoraWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.ReutersWordStreamer;
+import com.braincourt.vocabularyextraction.wordstreamers.SquadWordStreamer;
+import com.braincourt.vocabularyextraction.wordstreamers.WikiQAWordStreamer;
+import com.braincourt.vocabularyextraction.wordstreamers.WordStreamer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +15,12 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class is responsible for writing the whole vocabulary of all data sets to a file on disk.
@@ -30,33 +35,41 @@ public class VocabularyExtractor {
 
     private Map<String, Integer> vocabulary;
 
-    private QuoraWordStreamer quoraWordStreamer;
-    private ReutersWordStreamer reutersWordStreamer;
-    private NaturalQuestionsWordStreamer naturalQuestionsWordStreamer ;
+    private List<WordStreamer> wordStreamers;
+
     private int wordFrequencyRequirement;
 
     public VocabularyExtractor(@Value("${processed.data.dir}") String preprocessedDataDir,
                                @Value("${vocabulary.remove.words.fewer.than}") int wordFrequencyRequirement,
                                QuoraWordStreamer quoraWordStreamer,
                                ReutersWordStreamer reutersWordStreamer,
-                               NaturalQuestionsWordStreamer naturalQuestionStreamer) {
+                               //NaturalQuestionsDocumentWordStreamer naturalQuestionsDocumentWordStreamer
+                               NaturalQuestionsTitleWordStreamer naturalQuestionsTitleWordStreamer,
+                               NaturalQuestionsDocumentWordStreamer naturalQuestionsDocumentWordStreamer,
+                               SquadWordStreamer squadWordStreamer,
+                               WikiQAWordStreamer wikiQAWordStreamer) {
         this.preprocessedDataDir = preprocessedDataDir;
-        this.quoraWordStreamer = quoraWordStreamer;
-        this.reutersWordStreamer = reutersWordStreamer;
-        this.naturalQuestionsWordStreamer = naturalQuestionStreamer;
+        wordStreamers = Arrays.asList(
+                wikiQAWordStreamer,
+                squadWordStreamer,
+                quoraWordStreamer,
+                reutersWordStreamer,
+                naturalQuestionsTitleWordStreamer,
+                naturalQuestionsDocumentWordStreamer);
         this.wordFrequencyRequirement = wordFrequencyRequirement;
     }
 
-    public void writeVocabularyToFile() {
+    public void createVocabulary() {
         extractVocabulary();
         filterVocabulary();
+        AtomicInteger id = new AtomicInteger();
         try {
 
             BufferedWriter bufferedWriter = new BufferedWriter(
                     new FileWriter(preprocessedDataDir + "/vocabulary.txt"));
             vocabulary.forEach((word, count) -> {
                 try {
-                    bufferedWriter.write(word + " " + count);
+                    bufferedWriter.write(id.getAndIncrement() + " " + word + " " + count);
                     bufferedWriter.newLine();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -80,9 +93,7 @@ public class VocabularyExtractor {
         vocabulary = new HashMap<>();
         AtomicInteger i = new AtomicInteger();
         i.getAndIncrement();
-        // get a word-stream (all words, not just unique) from each dataset. Filter it here
-        Stream.concat(quoraWordStreamer.getWordStream(), Stream.concat(reutersWordStreamer.getWordStream(),
-                                                                       naturalQuestionsWordStreamer.getWordStream()))
+        wordStreamers.stream().flatMap(WordStreamer::getWordStream)
                 .forEach(word -> {
                     if (i.get() % 2000000 == 0) {
                         LOG.info(String.format("processing word %d: %s", i.get(), word));

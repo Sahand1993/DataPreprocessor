@@ -1,5 +1,7 @@
 package com.braincourt.vocabularyextraction.wordstreamers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -7,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public abstract class WordStreamer {
 
@@ -37,4 +40,19 @@ public abstract class WordStreamer {
      * @return a stream of all words in the data element
      */
     abstract Stream<String> getWords(JsonObject dataPoint);
+
+
+    protected Stream<String> getQuestionTokens(JsonObject dataPoint) {
+        return toStringStream(dataPoint.get("questionTokens").getAsJsonArray());
+    }
+
+    protected Stream<String> getTitleTokens(JsonObject dataPoint) {
+        return toStringStream(dataPoint.get("titleTokens").getAsJsonArray());
+    }
+
+    protected Stream<String> toStringStream(JsonArray tokens) {
+        return StreamSupport.stream(tokens.spliterator(), false)
+                .map(JsonElement::getAsString);
+    }
+
 }

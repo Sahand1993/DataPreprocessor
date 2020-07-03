@@ -1,0 +1,40 @@
+package com.braincourt.onehotvectors.entitystreamers;
+
+import com.braincourt.mysql.entities.NaturalQuestions;
+import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+@Component
+public class NaturalQuestionTitleStreamer extends NaturalQuestionStreamer {
+
+    public NaturalQuestionTitleStreamer(@Value("${processed.data.dir}") String preprocessedHome,
+                                      @Value("${nq.folder}") String naturalQuestionsFolderName,
+                                      @Value("${filename.json}") String fileName,
+                                      @Value("${indices.delimiter}") String indicesDelimiter,
+                                      @Value("${csv.delimiter}") String csvDelimiter){
+        super(
+                preprocessedHome + naturalQuestionsFolderName + fileName,
+                csvDelimiter,
+                indicesDelimiter
+        );
+    }
+
+
+    @Override
+    public List<NaturalQuestions> createEntities(JsonObject dataRow) {
+        NaturalQuestions naturalQuestion = new NaturalQuestions();
+        naturalQuestion
+                .setQuestionNGramIndices(getQuestionNGramIndices(dataRow))
+                .setQuestionWordIndices(getQuestionWordIndices(dataRow))
+                .setTitleNGramIndices(getTitleNGramIndices(dataRow))
+                .setTitleWordIndices(getTitleWordIndices(dataRow))
+                .setId(dataRow.get("id").getAsLong())
+                .setExampleId(dataRow.get("exampleId").getAsString());
+        return Collections.singletonList(naturalQuestion);
+    }
+}

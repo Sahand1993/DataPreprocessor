@@ -29,6 +29,7 @@ public class DataWriter {
         File outputFolder = new File(destinationDir);
 
         try {
+
             deleteContents(outputFolder);
 
             if (outputFolder.exists() && !outputFolder.delete()) {
@@ -51,9 +52,11 @@ public class DataWriter {
                 });
                 LOG.info(String.format("Finished writing to %s. Lines written: %d.", filePath, processedFiles));
                 bufferedWriter.close();
+            } else {
+                throw new IOException("Could not create the");
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -7,7 +7,11 @@ import com.braincourt.preprocessing.dataobjects.ReutersDataObject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 
@@ -15,6 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
@@ -23,7 +28,10 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 
+@Component
 public class ReutersFileVisitor extends FileVisitor {
+
+    private static final Set<String> CATEGORY_TAGS = new HashSet<>(Arrays.asList("CCAT", "MCAT", "ECAT", "GCAT"));
 
     public ReutersFileVisitor(Tokenizer tokenizer) {
         super(tokenizer);
@@ -31,16 +39,31 @@ public class ReutersFileVisitor extends FileVisitor {
 
 
     public Stream<DataObject> toDataObjects(Stream<Path> articlePaths) {
-        return articlePaths.map(this::toDataObject);
+        return articlePaths
+                .map(this::toDataObject)
+                .filter(this::hasTopicTags)
+                .filter(Objects::nonNull)
+                .filter(dataObject -> !((ReutersDataObject) dataObject).getTokens().isEmpty());
     }
 
-    private ReutersDataObject toDataObject(Path articlePath) {
+    private boolean hasTopicTags(DataObject dataObject) {
+        ReutersDataObject reutersDataObject = (ReutersDataObject) dataObject;
+        return reutersDataObject.getTopicTags().stream()
+                .anyMatch(tag -> !isCategoryTag(tag));
+    }
+
+    private boolean isCategoryTag(String tag) {
+        return tag.endsWith("CAT");
+    }
+
+    private DataObject toDataObject(Path articlePath) {
         ReutersDataObject dataObject = new ReutersDataObject();
         try {
 
             Document xmlDoc = getXmlDocument(articlePath);
 
-            dataObject.setArticleId(getArticleId(xmlDoc));
+            int articleId = getArticleId(xmlDoc);
+            dataObject.setArticleId(articleId);
 
             List<String> articleTokens = getTokens(xmlDoc);
             dataObject.setTokens(articleTokens);
@@ -103,11 +126,11 @@ public class ReutersFileVisitor extends FileVisitor {
         return topics;
     }
 
-    private String getArticleId(Document xmlDoc) {
-        return xmlDoc.getElementsByTagName("newsitem")
+    private int getArticleId(Document xmlDoc) {
+        return Integer.parseInt(xmlDoc.getElementsByTagName("newsitem")
                 .item(0)
                 .getAttributes()
-                .getNamedItem("itemid").getNodeValue();
+                .getNamedItem("itemid").getNodeValue());
     }
 
     private Document getXmlDocument(Path articlePath) throws ParserConfigurationException, SAXException, IOException {

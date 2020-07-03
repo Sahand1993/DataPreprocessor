@@ -6,26 +6,18 @@ import java.util.List;
 
 public class NaturalQuestionsDataObject extends DataObject {
 
-    private List<NaturalQuestionsToken> documentTokens;
-    private String documentTitle;
+    private List<String> titleTokens;
     private List<String> questionTokens;
- //   private List<LongAnswerCandidate> longAnswerCandidates;
     private int id;
+    private long exampleId;
+    private List<String> documentTokens;
 
-    public String getDocumentTitle() {
-        return documentTitle;
+    public List<String> getTitleTokens() {
+        return titleTokens;
     }
 
-    public void setDocumentTitle(String documentTitle) {
-        this.documentTitle = documentTitle;
-    }
-
-    public List<NaturalQuestionsToken> getDocumentTokens() {
-        return documentTokens;
-    }
-
-    public void setDocumentTokens(List<NaturalQuestionsToken> tokens) {
-        this.documentTokens = tokens;
+    public void setTitleTokens(List<String> titleTokens) {
+        this.titleTokens = titleTokens;
     }
 
     public List<String> getQuestionTokens() {
@@ -46,7 +38,11 @@ public class NaturalQuestionsDataObject extends DataObject {
         return gson.toJson(this);
     }
 
- //   public void setLongAnswerCandidates(List<LongAnswerCandidate> longAnswerCandidates) {
- //       this.longAnswerCandidates = longAnswerCandidates;
- //   }
+    public void setExampleId(long example_id) {
+        exampleId = example_id;
+    }
+
+    public void setDocumentTokens(List<String> documentTokens) {
+        this.documentTokens = documentTokens;
+    }
 }

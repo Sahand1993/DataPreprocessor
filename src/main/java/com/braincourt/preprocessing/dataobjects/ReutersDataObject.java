@@ -7,15 +7,15 @@ import java.util.List;
 
 public class ReutersDataObject extends DataObject {
 
-    String articleId;
+    int articleId;
     List<String> tokens;
     List<String> topicTags;
 
-    public String getArticleId() {
+    public int getArticleId() {
         return articleId;
     }
 
-    public void setArticleId(String articleId) {
+    public void setArticleId(int articleId) {
         this.articleId = articleId;
     }
 

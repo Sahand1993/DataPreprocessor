@@ -13,6 +13,9 @@ public class NaturalQuestionsJsonPojo {
     String question_text;
     List<String> question_tokens;
 
+    long example_id;
+
+
     public String getDocumentTitle() {
         return document_title;
     }
@@ -43,5 +46,13 @@ public class NaturalQuestionsJsonPojo {
 
     public void setQuestionTokens(List<String> question_tokens) {
         this.question_tokens = question_tokens;
+    }
+
+    public long getExample_id() {
+        return example_id;
+    }
+
+    public void setExample_id(long example_id) {
+        this.example_id = example_id;
     }
 }

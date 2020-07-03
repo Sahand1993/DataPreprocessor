@@ -1,10 +1,22 @@
 package com.braincourt.mysql.entities;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Lob;
 
 @Entity
 public class DuplicateQuestions extends DatabaseEntity {
+
+    @Id
+    public Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public int question1Id;
 
@@ -16,8 +28,13 @@ public class DuplicateQuestions extends DatabaseEntity {
     @Lob
     public String question2NGrams;
 
-    public Boolean isDuplicate;
+    @Lob
+    public String question1WordIndices;
 
+    @Lob
+    public String question2WordIndices;
+
+    public Boolean isDuplicate;
 
     public String getQuestion1NGrams() {
         return question1NGrams;
@@ -33,6 +50,14 @@ public class DuplicateQuestions extends DatabaseEntity {
 
     public void setQuestion2NGrams(String question2NGrams) {
         this.question2NGrams = question2NGrams;
+    }
+
+    public void setQuestion1WordIndices(String question1WordIndices) {
+        this.question1WordIndices = question1WordIndices;
+    }
+
+    public void setQuestion2WordIndices(String question2WordIndices) {
+        this.question2WordIndices = question2WordIndices;
     }
 
     public Boolean getIsDuplicate() {

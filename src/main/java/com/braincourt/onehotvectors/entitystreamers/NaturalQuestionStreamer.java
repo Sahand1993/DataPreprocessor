@@ -1,42 +1,37 @@
 package com.braincourt.onehotvectors.entitystreamers;
 
 import com.braincourt.mysql.entities.NaturalQuestions;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public abstract class NaturalQuestionStreamer extends EntityStreamer<NaturalQuestions> {
 
-    AtomicLong currentId = new AtomicLong(1);
-
-    public NaturalQuestionStreamer(String jsonDataPath,
-                                   String csvDelimiter,
-                                   String indicesDelimiter){
+    public NaturalQuestionStreamer(String jsonDataPath, String csvDelimiter, String indicesDelimiter) {
         super(jsonDataPath, csvDelimiter, indicesDelimiter);
     }
 
-    @Override
-    public List<NaturalQuestions> createEntities(JsonObject dataRow) {
-        NaturalQuestions naturalQuestion = new NaturalQuestions();
-        naturalQuestion.setQuestionNGrams(getQuestionIndices(dataRow));
-        naturalQuestion.setDocumentNGrams(getDocumentIndices(dataRow));
-        naturalQuestion.setId(currentId.getAndIncrement());
-        return Collections.singletonList(naturalQuestion);
+    protected String getQuestionNGramIndices(JsonObject dataRow) {
+        return getNgramIndices(dataRow, "questionTokens");
     }
 
-    protected abstract String getQuestionIndices(JsonObject dataRow);
+    protected String getQuestionWordIndices(JsonObject dataRow) {
+        return getWordIndicesWithFreqs(dataRow, "questionTokens");
+    }
 
-    protected abstract String getDocumentIndices(JsonObject dataRow);
-
-    protected List<String> getDocumentTokens(JsonObject dataRow) {
-        List<JsonObject> documentTokenObjects = getAsList(dataRow.get("documentTokens").getAsJsonArray()).stream()
-                .map(JsonElement::getAsJsonObject)
+    protected String getTitleNGramIndices(JsonObject dataRow) {
+        JsonArray tokensArray = dataRow.get("titleTokens").getAsJsonArray();
+        List<String> tokens = StreamSupport.stream(tokensArray.spliterator(), false)
+                .map(JsonElement::getAsString)
                 .collect(Collectors.toList());
+        return joinIdsWithFreqs(getNGramIndicesWithFreqs(tokens));
+    }
 
-        return documentTokenObjects.stream().map(jsonObject -> jsonObject.get("token").getAsString()).collect(Collectors.toList());
+    protected String getTitleWordIndices(JsonObject dataRow) {
+        return getWordIndicesWithFreqs(dataRow, "titleTokens");
     }
 }
