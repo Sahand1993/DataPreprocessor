@@ -1,0 +1,34 @@
+1. It is necessary to provide the correct paths in src/main/resources/application.properties for where to read the raw
+data sets and where to write the pre-processed data sets. Specifically, you need to change the variables
+
+processed.data.dir=/Users/sahandzarrinkoub/School/year5/thesis/datasets/preprocessed_datasets_nqtitles/
+stopwords.path=/Users/sahandzarrinkoub/School/year5/thesis/datasets/datasets/stopwords.txt
+naturalQuestions.raw.home=/Users/sahandzarrinkoub/School/year5/thesis/datasets/datasets/nq/
+quora.raw.home=/Users/sahandzarrinkoub/School/year5/thesis/datasets/datasets/quora/
+reuters.raw.home=/Users/sahandzarrinkoub/School/year5/thesis/datasets/datasets/reuters/
+squad.raw.home=/Users/sahandzarrinkoub/School/year5/thesis/datasets/datasets/squad/
+wikiQA.raw.home=/Users/sahandzarrinkoub/School/year5/thesis/datasets/datasets/wikiqa/
+
+These all have to be changed to correct paths on the environment you're on. Here's some more info about each property
+listed above.
+
+processed.data.dir is the folder where all the pre-processed data sets will end up. You can choose this freely, but
+remember that you have to point to the data sets in this folder when you are training the models in the
+https://github.com/Sahand1993/thesis.git repo.
+
+stopwords.path must point to a stopwords file.
+
+All other properties (the ones that end with ".raw.home") are paths to the raw data sets.
+
+
+
+2. You must also have docker installed and run mysql docker-start-mysq-database.sh to initialize the database used by
+Rcv1ArticlesDatabaseWriter (and other database writers although they are not used in this version of the preprocessor)
+
+When you have your database you need to provide the correct credentials in the properties
+
+spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/datasets
+spring.datasource.username=preprocessor
+spring.datasource.password=preprocessor
+
+in src/main/resources/applications.properties.
