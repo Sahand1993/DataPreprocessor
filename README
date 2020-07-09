@@ -21,7 +21,6 @@ stopwords.path must point to a stopwords file.
 All other properties (the ones that end with ".raw.home") are paths to the raw data sets.
 
 
-
 2. You must also have docker installed and run mysql docker-start-mysq-database.sh to initialize the database used by
 Rcv1ArticlesDatabaseWriter (and other database writers although they are not used in this version of the preprocessor)
 

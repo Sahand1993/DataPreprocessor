@@ -43,7 +43,8 @@ public class ReutersFileVisitor extends FileVisitor {
                 .map(this::toDataObject)
                 .filter(this::hasTopicTags)
                 .filter(Objects::nonNull)
-                .filter(dataObject -> !((ReutersDataObject) dataObject).getTokens().isEmpty());
+                .filter(dataObject -> !((ReutersDataObject) dataObject).getTokens().isEmpty())
+                .limit(170000);
     }
 
     private boolean hasTopicTags(DataObject dataObject) {
