@@ -1,13 +1,14 @@
-package com.braincourt.preprocessing;
+package com.braincourt.preprocessing.preprocessors;
 
+import com.braincourt.preprocessing.DataWriter;
 import com.braincourt.preprocessing.filevisitors.ReutersFileVisitor;
 import com.braincourt.preprocessing.traversers.ReutersTraverser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PreprocessRcv1 extends PreprocessingStep {
-    public PreprocessRcv1(
+public class Rcv1Preprocessor extends FileSystemPreprocessor {
+    public Rcv1Preprocessor(
         DataWriter dataWriter,
         ReutersTraverser fileTraverser,
         ReutersFileVisitor fileVisitor,

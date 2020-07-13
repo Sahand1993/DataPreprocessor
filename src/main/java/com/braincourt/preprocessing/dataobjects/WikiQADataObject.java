@@ -1,7 +1,5 @@
 package com.braincourt.preprocessing.dataobjects;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 
 public class WikiQADataObject extends DataObject {
@@ -48,13 +46,9 @@ public class WikiQADataObject extends DataObject {
         return this;
     }
 
-    @Override
-    public String toJsonString() {
-        return new Gson().toJson(this);
-    }
-
     public DataObject setAnswered(boolean answered) {
         this.answered = answered;
         return this;
     }
+
 }

@@ -18,8 +18,9 @@ public class DuplicateQuestionStreamer extends EntityStreamer<DuplicateQuestions
     public DuplicateQuestionStreamer(@Value("${processed.data.dir}") String preprocessedHome,
                                      @Value("${filename.json}") String dataFileName,
                                      @Value("${csv.delimiter}") String csvDelimiter,
-                                     @Value("${indices.delimiter}") String indicesDelimiter) {
-        super(preprocessedHome + "quora/" + dataFileName, csvDelimiter, indicesDelimiter); // TODO: remove train and validation class, send list of all paths here instead.
+                                     @Value("${indices.delimiter}") String indicesDelimiter,
+                                     @Value("${quora.folder}") String quoraFolder) {
+        super(preprocessedHome + quoraFolder + dataFileName, csvDelimiter, indicesDelimiter);
     }
 
     /**

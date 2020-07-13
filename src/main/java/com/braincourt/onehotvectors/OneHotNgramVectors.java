@@ -3,9 +3,9 @@ package com.braincourt.onehotvectors;
 import com.braincourt.datasetdividers.Dividing;
 import com.braincourt.onehotvectors.writers.Writer;
 import com.braincourt.onehotvectors.writers.database.Rcv1ArticlesDatabaseWriter;
+import com.braincourt.onehotvectors.writers.file.ConfluenceFileWriter;
 import com.braincourt.onehotvectors.writers.file.DuplicateQuestionsIndicesFileWriter;
 import com.braincourt.onehotvectors.writers.file.NaturalQuestionsAllIndicesFileWriter;
-import com.braincourt.onehotvectors.writers.file.NaturalQuestionsTitleIndicesFileWriter;
 import com.braincourt.onehotvectors.writers.file.Rcv1ArticlesIndicesFileWriter;
 import com.braincourt.onehotvectors.writers.file.SquadIndicesFileWriter;
 import com.braincourt.onehotvectors.writers.file.WikiQAIndicesFileWriter;
@@ -16,12 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,6 +54,7 @@ public class OneHotNgramVectors {
                               @Value("${ngram.size}") int nGramSize,
 
                               Dividing dividing,
+                              ConfluenceFileWriter confluenceFileWriter,
                               Rcv1ArticlesDatabaseWriter rcv1ArticlesDatabaseWriter,
                               DuplicateQuestionsIndicesFileWriter duplicateQuestionsIndicesFileWriter,
                               NaturalQuestionsAllIndicesFileWriter naturalQuestionsAllIndicesFileWriter,
@@ -68,6 +65,7 @@ public class OneHotNgramVectors {
         this.processedDataDir = processedDataDir;
         this.dividing = dividing;
         WRITERS.addAll(Arrays.asList(
+                confluenceFileWriter,
                 wikiQAIndicesFileWriter,
                 squadIndicesFileWriter,
                 duplicateQuestionsIndicesFileWriter,
@@ -94,70 +92,48 @@ public class OneHotNgramVectors {
     }
 
     private void constructNGramVocabulary(int n) {
-        try {
-            ObjectInputStream wordsToNGramsWithIdsIn = new ObjectInputStream(new FileInputStream(processedDataDir + "/wordsToNGramIdsToFreqs.ser"));
-            ObjectInputStream nGramToIdIn = new ObjectInputStream(new FileInputStream(processedDataDir + "/nGramToId.ser"));
-            wordsToNGramIdsToFreqs = (Map<String, Map<Integer, Integer>>) wordsToNGramsWithIdsIn.readObject();
-            nGramToId = (Map<String, Integer>) nGramToIdIn.readObject();
-            LOG.info("wordToNGramsWithIds and nGramsToId found and loaded");
-        } catch (IOException | ClassNotFoundException e) {
-            LOG.info("Could not find ngram indices, indexing...");
-            vocabulary.keySet().forEach(word -> {
-                if (!wordsToNGramIdsToFreqs.containsKey(word)) {
+        LOG.info("Could not find ngram indices, indexing...");
+        vocabulary.keySet().forEach(word -> {
+            if (!wordsToNGramIdsToFreqs.containsKey(word)) {
 
-                    getNGrams(n, word)
-                            .forEach(nGram -> {
+                getNGrams(n, word)
+                        .forEach(nGram -> {
 
-                                int nGramId;
-                                if (!nGramToId.containsKey(nGram)) {
+                            int nGramId;
+                            if (!nGramToId.containsKey(nGram)) {
 
-                                    nGramToId.put(nGram, currentId);
-                                    nGramId = currentId++;
+                                nGramToId.put(nGram, currentId);
+                                nGramId = currentId++;
 
-                                } else {
+                            } else {
 
-                                    nGramId = nGramToId.get(nGram);
+                                nGramId = nGramToId.get(nGram);
 
-                                }
+                            }
 
-                                if (wordsToNGramIdsToFreqs.containsKey(word)) {
+                            if (wordsToNGramIdsToFreqs.containsKey(word)) {
 
-                                    Map<Integer, Integer> nGramIdsToFreqs = wordsToNGramIdsToFreqs.get(word);
-                                    if (nGramIdsToFreqs.containsKey(nGramId)) {
+                                Map<Integer, Integer> nGramIdsToFreqs = wordsToNGramIdsToFreqs.get(word);
+                                if (nGramIdsToFreqs.containsKey(nGramId)) {
 
-                                        nGramIdsToFreqs.put(nGramId, nGramIdsToFreqs.get(nGramId) + 1);
-
-                                    } else {
-
-                                        nGramIdsToFreqs.put(nGramId, 1);
-
-                                    }
+                                    nGramIdsToFreqs.put(nGramId, nGramIdsToFreqs.get(nGramId) + 1);
 
                                 } else {
 
-                                    Map<Integer, Integer> nGramIdToFreq = new HashMap<>();
-                                    nGramIdToFreq.put(nGramId, 1);
-                                    wordsToNGramIdsToFreqs.put(word, nGramIdToFreq);
+                                    nGramIdsToFreqs.put(nGramId, 1);
 
                                 }
-                            });
-                }
-            });
-            try {
-                LOG.info("Serializing wordsToNGramIdsToFreqs and nGramsToId.");
-                ObjectOutputStream wordsToNGramsWithIdsOut = new ObjectOutputStream(new FileOutputStream(processedDataDir + "/wordsToNGramIdsToFreqs.ser"));
-                ObjectOutputStream nGramToIdOut = new ObjectOutputStream(new FileOutputStream(processedDataDir + "/nGramToId.ser"));
-                wordsToNGramsWithIdsOut.writeObject(wordsToNGramIdsToFreqs);
-                nGramToIdOut.writeObject(nGramToId);
-            } catch (IOException e2) {
-                e2.printStackTrace();
+
+                            } else {
+
+                                Map<Integer, Integer> nGramIdToFreq = new HashMap<>();
+                                nGramIdToFreq.put(nGramId, 1);
+                                wordsToNGramIdsToFreqs.put(word, nGramIdToFreq);
+
+                            }
+                        });
             }
-        }
-        try {
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void writeNGramsToFile() {

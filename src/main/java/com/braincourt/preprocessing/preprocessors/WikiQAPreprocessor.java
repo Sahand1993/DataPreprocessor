@@ -1,13 +1,14 @@
-package com.braincourt.preprocessing;
+package com.braincourt.preprocessing.preprocessors;
 
+import com.braincourt.preprocessing.DataWriter;
 import com.braincourt.preprocessing.filevisitors.WikiQAFileVisitor;
 import com.braincourt.preprocessing.traversers.WikiQATraverser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PreprocessWikiQA extends PreprocessingStep {
-    public PreprocessWikiQA(
+public class WikiQAPreprocessor extends FileSystemPreprocessor {
+    public WikiQAPreprocessor(
             DataWriter dataWriter,
             WikiQATraverser fileTraverser,
             WikiQAFileVisitor fileVisitor,

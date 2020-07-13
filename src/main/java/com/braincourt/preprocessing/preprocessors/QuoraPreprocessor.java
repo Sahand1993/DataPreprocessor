@@ -1,14 +1,15 @@
-package com.braincourt.preprocessing;
+package com.braincourt.preprocessing.preprocessors;
 
+import com.braincourt.preprocessing.DataWriter;
 import com.braincourt.preprocessing.filevisitors.QuoraFileVisitor;
 import com.braincourt.preprocessing.traversers.QuoraTraverser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PreprocessQuora extends PreprocessingStep {
+public class QuoraPreprocessor extends FileSystemPreprocessor {
 
-    public PreprocessQuora(
+    public QuoraPreprocessor(
             DataWriter dataWriter,
             QuoraTraverser fileTraverser,
             QuoraFileVisitor fileVisitor,

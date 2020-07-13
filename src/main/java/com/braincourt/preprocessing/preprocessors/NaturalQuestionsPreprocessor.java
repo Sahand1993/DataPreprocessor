@@ -1,14 +1,15 @@
-package com.braincourt.preprocessing;
+package com.braincourt.preprocessing.preprocessors;
 
+import com.braincourt.preprocessing.DataWriter;
 import com.braincourt.preprocessing.filevisitors.NaturalQuestionsFileVisitor;
 import com.braincourt.preprocessing.traversers.NaturalQuestionsTraverser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PreprocessNaturalQuestions extends PreprocessingStep {
+public class NaturalQuestionsPreprocessor extends FileSystemPreprocessor {
 
-    public PreprocessNaturalQuestions(
+    public NaturalQuestionsPreprocessor(
             DataWriter dataWriter,
             NaturalQuestionsTraverser fileTraverser,
             NaturalQuestionsFileVisitor fileVisitor,

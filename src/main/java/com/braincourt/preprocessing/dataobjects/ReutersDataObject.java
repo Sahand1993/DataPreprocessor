@@ -35,12 +35,4 @@ public class ReutersDataObject extends DataObject {
         this.topicTags = topicTags;
     }
 
-    @Override
-    public String toJsonString() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("article_id", getArticleId());
-        jsonObject.put("tokens", new JSONArray(getTokens()));
-        jsonObject.put("topic_tags", new JSONArray(getTopicTags()));
-        return jsonObject.toString();
-    }
 }

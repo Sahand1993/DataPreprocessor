@@ -1,7 +1,5 @@
 package com.braincourt.preprocessing.dataobjects;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 
 public class NaturalQuestionsDataObject extends DataObject {
@@ -32,12 +30,6 @@ public class NaturalQuestionsDataObject extends DataObject {
         this.id = id;
     }
 
-    @Override
-    public String toJsonString() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-
     public void setExampleId(long example_id) {
         exampleId = example_id;
     }
@@ -45,4 +37,5 @@ public class NaturalQuestionsDataObject extends DataObject {
     public void setDocumentTokens(List<String> documentTokens) {
         this.documentTokens = documentTokens;
     }
+
 }

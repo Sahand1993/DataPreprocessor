@@ -1,7 +1,5 @@
 package com.braincourt.preprocessing.dataobjects;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 
 public class QuoraQuestionPairDataObject extends DataObject {
@@ -25,11 +23,6 @@ public class QuoraQuestionPairDataObject extends DataObject {
         this.question1_tokens = question1Tokens;
         this.question2_tokens = question2Tokens;
         this.isDuplicate = isDuplicate;
-    }
-
-    @Override
-    public String toJsonString() {
-        return new Gson().toJson(this);
     }
 
     public int getId() {
@@ -79,4 +72,5 @@ public class QuoraQuestionPairDataObject extends DataObject {
     public void setDuplicate(Boolean duplicate) {
         isDuplicate = duplicate;
     }
+
 }

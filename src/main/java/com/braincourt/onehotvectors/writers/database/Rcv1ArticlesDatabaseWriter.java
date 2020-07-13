@@ -76,30 +76,16 @@ public class Rcv1ArticlesDatabaseWriter extends DatabaseWriter<RcvArticles> {
     }
 
     private void createIndex() {
-        try {
-            //ObjectInputStream in = new ObjectInputStream(new FileInputStream("/Users/sahandzarrinkoub/School/year5/thesis/datasets/preprocessed_datasets/reutersIndex.ser"));
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(indexPath));
-            reutersTagsToIdIndex = (ReutersTagsToIdIndex) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            LongStream.range(1, articlesWithTopicTagsRepository.count() + 1).boxed()
-                    .map(id -> articlesWithTopicTagsRepository.findById(id).orElse(null))
-                    .filter(Objects::nonNull)
-                    .peek(article -> {
-                        if (article.getId() % 1000 == 0) {
-                            LOG.info(String.format("Adding %dth article to index", article.getId()));
-                        }
-                    })
-                    .forEach(this::addToIndex);
-
-            try {
-                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(indexPath));
-                out.writeObject(reutersTagsToIdIndex);
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            }
-        }
-
+        LOG.info("Creating new index");
+        LongStream.range(1, articlesWithTopicTagsRepository.count() + 1).boxed()
+                .map(id -> articlesWithTopicTagsRepository.findById(id).orElse(null))
+                .filter(Objects::nonNull)
+                .peek(article -> {
+                    if (article.getId() % 1000 == 0) {
+                        LOG.info(String.format("Adding %dth article to index", article.getId()));
+                    }
+                })
+                .forEach(this::addToIndex);
     }
 
     private void addToIndex(RcvArticles article) {

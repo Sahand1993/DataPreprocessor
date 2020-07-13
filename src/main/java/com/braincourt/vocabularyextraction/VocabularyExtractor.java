@@ -1,5 +1,6 @@
 package com.braincourt.vocabularyextraction;
 
+import com.braincourt.vocabularyextraction.wordstreamers.ConfluenceWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.NaturalQuestionsDocumentWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.NaturalQuestionsTitleWordStreamer;
 import com.braincourt.vocabularyextraction.wordstreamers.QuoraWordStreamer;
@@ -41,6 +42,7 @@ public class VocabularyExtractor {
 
     public VocabularyExtractor(@Value("${processed.data.dir}") String preprocessedDataDir,
                                @Value("${vocabulary.remove.words.fewer.than}") int wordFrequencyRequirement,
+                               ConfluenceWordStreamer confluenceWordStreamer,
                                QuoraWordStreamer quoraWordStreamer,
                                ReutersWordStreamer reutersWordStreamer,
                                NaturalQuestionsTitleWordStreamer naturalQuestionsTitleWordStreamer,
@@ -49,6 +51,7 @@ public class VocabularyExtractor {
                                WikiQAWordStreamer wikiQAWordStreamer) {
         this.preprocessedDataDir = preprocessedDataDir;
         wordStreamers = Arrays.asList(
+                confluenceWordStreamer,
                 wikiQAWordStreamer,
                 squadWordStreamer,
                 quoraWordStreamer,

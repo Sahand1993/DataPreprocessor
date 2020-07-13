@@ -1,6 +1,7 @@
 package com.braincourt.preprocessing;
 
 import com.braincourt.preprocessing.dataobjects.DataObject;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,8 @@ public class DataWriter {
     private int processedFiles = 0;
 
     private String jsonFile;
+
+    Gson gson = new Gson();
 
     public DataWriter(@Value("${filename.json}") String jsonFileName) {
         this.jsonFile = jsonFileName;
@@ -43,7 +46,7 @@ public class DataWriter {
 
                 LOG.info(String.format("Beginning writing to %s folder.", outputFolder));
 
-                dataObjects.forEach(dataObject -> { // TODO remove limit after debugging
+                dataObjects.forEach(dataObject -> {
                     writeTo(bufferedWriter, dataObject);
 
                     if (++processedFiles % 1000 == 0) {
@@ -64,7 +67,7 @@ public class DataWriter {
     private void writeTo(BufferedWriter bw, DataObject dataObject) {
         try {
 
-            bw.write(dataObject.toJsonString());
+            bw.write(gson.toJson(dataObject));
             bw.newLine();
 
         } catch (IOException e) {

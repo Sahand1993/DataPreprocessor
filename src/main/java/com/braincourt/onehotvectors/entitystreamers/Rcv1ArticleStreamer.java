@@ -36,7 +36,7 @@ public class Rcv1ArticleStreamer extends EntityStreamer<RcvArticles> {
 
     @Override
     public List<RcvArticles> createEntities(JsonObject articleJson) {
-        int articleId = articleJson.get("article_id").getAsInt();
+        int articleId = articleJson.get("articleId").getAsInt();
         String articleNGramIndices = getNgramIndices(articleJson, "tokens");
         String articleWordIndices = getWordIndicesWithFreqs(articleJson, "tokens");
         List<String> tags = getTopicTags(articleJson);
@@ -56,7 +56,7 @@ public class Rcv1ArticleStreamer extends EntityStreamer<RcvArticles> {
     }
 
     private List<String> getTopicTags(JsonObject json) {
-        return StreamSupport.stream(json.get("topic_tags").getAsJsonArray().spliterator(), false)
+        return StreamSupport.stream(json.get("topicTags").getAsJsonArray().spliterator(), false)
                 .map(JsonElement::getAsString)
                 .filter(tag -> !tag.endsWith("CAT"))
                 .collect(Collectors.toList());

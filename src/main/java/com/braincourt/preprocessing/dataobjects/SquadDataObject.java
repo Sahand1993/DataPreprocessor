@@ -1,7 +1,5 @@
 package com.braincourt.preprocessing.dataobjects;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 
 public class SquadDataObject extends DataObject {
@@ -50,8 +48,5 @@ public class SquadDataObject extends DataObject {
         this.titleId = titleId;
     }
 
-    @Override
-    public String toJsonString() {
-        return new Gson().toJson(this);
-    }
+
 }
