@@ -65,13 +65,13 @@ public class OneHotNgramVectors {
         this.processedDataDir = processedDataDir;
         this.dividing = dividing;
         WRITERS.addAll(Arrays.asList(
-                confluenceFileWriter,
-                wikiQAIndicesFileWriter,
-                squadIndicesFileWriter,
-                duplicateQuestionsIndicesFileWriter,
-                naturalQuestionsAllIndicesFileWriter,
-                rcv1ArticlesDatabaseWriter,
-                rcv1ArticlesIndicesFileWriter
+                confluenceFileWriter
+//                wikiQAIndicesFileWriter,
+//                squadIndicesFileWriter,
+//                duplicateQuestionsIndicesFileWriter,
+//                naturalQuestionsAllIndicesFileWriter,
+//                rcv1ArticlesDatabaseWriter,
+//                rcv1ArticlesIndicesFileWriter
                 ));
     }
 
