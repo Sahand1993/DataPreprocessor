@@ -22,4 +22,16 @@ public class ConfluenceDataObject extends DataObject {
         this.webUi = webUi;
         return this;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public List<String> getTitleTokens() {
+        return titleTokens;
+    }
+
+    public String getWebUi() {
+        return webUi;
+    }
 }

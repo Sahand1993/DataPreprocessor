@@ -1,5 +1,6 @@
 package com.braincourt.preprocessing.preprocessors;
 
+import com.braincourt.mysql.entities.ConfluenceDocument;
 import com.braincourt.preprocessing.DataWriter;
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.ConfluenceDataObject;
@@ -108,7 +109,7 @@ public class ConfluencePreprocessor extends Preprocessor {
             dataObjects = Stream.concat(dataObjects, getDataObjects(responseJson.get("results").getAsJsonArray()));
             next = getNext(responseJson);
         }
-        return dataObjects;
+        return dataObjects.filter(dataObject -> !((ConfluenceDataObject)dataObject).getTitleTokens().isEmpty());
     }
 
     private String getNext(JsonObject responseJson) {
