@@ -1,6 +1,5 @@
 package com.braincourt.preprocessing.preprocessors;
 
-import com.braincourt.mysql.entities.ConfluenceDocument;
 import com.braincourt.preprocessing.DataWriter;
 import com.braincourt.preprocessing.Tokenizer;
 import com.braincourt.preprocessing.dataobjects.ConfluenceDataObject;

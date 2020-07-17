@@ -18,12 +18,12 @@ public class Processing {
     private final List<Preprocessor> PREPROCESSING_STEPS;
 
     public Processing(
-            ConfluencePreprocessor confluencePreprocessor,
-            WikiQAPreprocessor wikiQAPreprocessor,
-            SquadPreprocessor squadPreprocessor,
-            Rcv1Preprocessor rcv1Preprocessor,
-            NaturalQuestionsPreprocessor naturalQuestionsPreprocessor,
-            QuoraPreprocessor quoraPreprocessor
+            ConfluencePreprocessor confluencePreprocessor
+//            WikiQAPreprocessor wikiQAPreprocessor,
+//            SquadPreprocessor squadPreprocessor,
+//            Rcv1Preprocessor rcv1Preprocessor,
+//            NaturalQuestionsPreprocessor naturalQuestionsPreprocessor,
+//            QuoraPreprocessor quoraPreprocessor
     ) {
         PREPROCESSING_STEPS = Arrays.asList(
                 confluencePreprocessor

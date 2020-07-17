@@ -48,22 +48,20 @@ public class OneHotNgramVectors {
 
     Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    Dividing dividing;
 
     public OneHotNgramVectors(@Value("${processed.data.dir}") String processedDataDir,
                               @Value("${ngram.size}") int nGramSize,
 
-                              Dividing dividing,
-                              ConfluenceFileWriter confluenceFileWriter,
-                              Rcv1ArticlesDatabaseWriter rcv1ArticlesDatabaseWriter,
-                              DuplicateQuestionsIndicesFileWriter duplicateQuestionsIndicesFileWriter,
-                              NaturalQuestionsAllIndicesFileWriter naturalQuestionsAllIndicesFileWriter,
-                              Rcv1ArticlesIndicesFileWriter rcv1ArticlesIndicesFileWriter,
-                              SquadIndicesFileWriter squadIndicesFileWriter,
-                              WikiQAIndicesFileWriter wikiQAIndicesFileWriter) {
+                              ConfluenceFileWriter confluenceFileWriter
+//                              Rcv1ArticlesDatabaseWriter rcv1ArticlesDatabaseWriter,
+//                              DuplicateQuestionsIndicesFileWriter duplicateQuestionsIndicesFileWriter,
+//                              NaturalQuestionsAllIndicesFileWriter naturalQuestionsAllIndicesFileWriter,
+//                              Rcv1ArticlesIndicesFileWriter rcv1ArticlesIndicesFileWriter,
+//                              SquadIndicesFileWriter squadIndicesFileWriter,
+//                              WikiQAIndicesFileWriter wikiQAIndicesFileWriter
+    ) {
         this.nGramSize = nGramSize;
         this.processedDataDir = processedDataDir;
-        this.dividing = dividing;
         WRITERS.addAll(Arrays.asList(
                 confluenceFileWriter
 //                wikiQAIndicesFileWriter,
@@ -84,9 +82,6 @@ public class OneHotNgramVectors {
 
         LOG.info("Writing ngrams to file.");
         writeNGramsToFile();
-
-    //    LOG.info("Dividing datasets.");
-    //    dividing.divideAll();
 
         write();
     }
