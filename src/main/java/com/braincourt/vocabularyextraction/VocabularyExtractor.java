@@ -42,22 +42,24 @@ public class VocabularyExtractor {
 
     public VocabularyExtractor(@Value("${processed.data.dir}") String preprocessedDataDir,
                                @Value("${vocabulary.remove.words.fewer.than}") int wordFrequencyRequirement,
-                               ConfluenceWordStreamer confluenceWordStreamer,
-                               QuoraWordStreamer quoraWordStreamer,
-                               ReutersWordStreamer reutersWordStreamer,
-                               NaturalQuestionsTitleWordStreamer naturalQuestionsTitleWordStreamer,
-                               NaturalQuestionsDocumentWordStreamer naturalQuestionsDocumentWordStreamer,
-                               SquadWordStreamer squadWordStreamer,
-                               WikiQAWordStreamer wikiQAWordStreamer) {
+                               ConfluenceWordStreamer confluenceWordStreamer
+//                               QuoraWordStreamer quoraWordStreamer, // TODO: Consider how these streamers can be added automatically depending on which preprocessors we have selected. To add them manually like we do here is bug-prone.
+//                               ReutersWordStreamer reutersWordStreamer,
+//                               NaturalQuestionsTitleWordStreamer naturalQuestionsTitleWordStreamer,
+//                               NaturalQuestionsDocumentWordStreamer naturalQuestionsDocumentWordStreamer,
+//                               SquadWordStreamer squadWordStreamer,
+//                               WikiQAWordStreamer wikiQAWordStreamer
+    ) {
         this.preprocessedDataDir = preprocessedDataDir;
         wordStreamers = Arrays.asList(
-                confluenceWordStreamer,
-                wikiQAWordStreamer,
-                squadWordStreamer,
-                quoraWordStreamer,
-                reutersWordStreamer,
-                naturalQuestionsTitleWordStreamer,
-                naturalQuestionsDocumentWordStreamer);
+                confluenceWordStreamer
+//                wikiQAWordStreamer,
+//                squadWordStreamer,
+//                quoraWordStreamer,
+//                reutersWordStreamer,
+//                naturalQuestionsTitleWordStreamer,
+//                naturalQuestionsDocumentWordStreamer
+        );
         this.wordFrequencyRequirement = wordFrequencyRequirement;
     }
 
