@@ -7,6 +7,7 @@ public class ConfluenceDataObject extends DataObject {
     private String id;
     private List<String> titleTokens;
     private String webUi;
+    private String title;
 
     public ConfluenceDataObject setId(String id) {
         this.id = id;
@@ -33,5 +34,14 @@ public class ConfluenceDataObject extends DataObject {
 
     public String getWebUi() {
         return webUi;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public ConfluenceDataObject setTitle(String title) {
+        this.title = title;
+        return this;
     }
 }

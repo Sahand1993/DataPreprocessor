@@ -61,6 +61,7 @@ public class ConfluencePreprocessor extends Preprocessor {
                 JsonObject jsonObject = json.getAsJsonObject();
                 return new ConfluenceDataObject()
                         .setId(jsonObject.get("id").getAsString())
+                        .setTitle(jsonObject.get("title").getAsString())
                         .setTitleTokens(tokenizer.processTokens(jsonObject.get("title").getAsString()))
                         .setWebUi(jsonObject.get("_links").getAsJsonObject().get("webui").getAsString());
             }

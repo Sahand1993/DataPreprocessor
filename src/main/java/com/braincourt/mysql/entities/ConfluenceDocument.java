@@ -15,10 +15,6 @@ public class ConfluenceDocument extends DatabaseEntity {
         this.id = id;
     }
 
-    public String getTitleNGrams() {
-        return titleNGrams;
-    }
-
     public void setTitleNGrams(String titleNGrams) {
         this.titleNGrams = titleNGrams;
     }

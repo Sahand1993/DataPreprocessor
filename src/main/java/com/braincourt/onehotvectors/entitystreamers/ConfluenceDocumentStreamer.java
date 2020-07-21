@@ -25,6 +25,7 @@ public class ConfluenceDocumentStreamer extends EntityStreamer<ConfluenceDocumen
         ConfluenceDocument confluenceDocument = new ConfluenceDocument();
         confluenceDocument.setTitleNGrams(getNgramIndices(dataRow, "titleTokens"));
         confluenceDocument.setId(dataRow.get("id").getAsLong());
+        confluenceDocument.setTitle(dataRow.get("title").getAsString());
         return Collections.singletonList(confluenceDocument);
     }
 }
