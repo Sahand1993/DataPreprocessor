@@ -44,13 +44,13 @@ public class Rcv1ArticleStreamer extends EntityStreamer<RcvArticles> {
         if (tags.isEmpty()) {
             RcvArticlesWithoutTopicTags article
                     = new RcvArticlesWithoutTopicTags(articleId, articleNGramIndices, articleWordIndices);
-            article.setId(articlesWithoutTopicTagsCurrentId.getAndIncrement());
+            article.setId(Long.toString(articlesWithoutTopicTagsCurrentId.getAndIncrement()));
             return Collections.singletonList(article);
         } else {
             RcvArticlesWithTopicTags article
                     = new RcvArticlesWithTopicTags(articleId, articleNGramIndices, articleWordIndices);
             article.setAllTags(tags);
-            article.setId(articlesWithTopicTagsCurrentId.getAndIncrement());
+            article.setId(Long.toString(articlesWithTopicTagsCurrentId.getAndIncrement()));
             return Collections.singletonList(article);
         }
     }

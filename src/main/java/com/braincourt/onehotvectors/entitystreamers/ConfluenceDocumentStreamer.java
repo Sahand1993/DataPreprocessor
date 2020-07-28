@@ -24,8 +24,11 @@ public class ConfluenceDocumentStreamer extends EntityStreamer<ConfluenceDocumen
     public List<ConfluenceDocument> createEntities(JsonObject dataRow) {
         ConfluenceDocument confluenceDocument = new ConfluenceDocument();
         confluenceDocument.setTitleNGrams(getNgramIndices(dataRow, "titleTokens"));
-        confluenceDocument.setId(dataRow.get("id").getAsLong());
-        confluenceDocument.setTitle(dataRow.get("title").getAsString());
-        return Collections.singletonList(confluenceDocument);
+        if (dataRow.get("id").getAsString().equals("-")) {
+            return Collections.emptyList();
+        } else {
+            confluenceDocument.setId(dataRow.get("id").getAsString());
+            return Collections.singletonList(confluenceDocument);
+        }
     }
 }

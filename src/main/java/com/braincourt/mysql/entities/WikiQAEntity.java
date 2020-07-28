@@ -1,7 +1,7 @@
 package com.braincourt.mysql.entities;
 
 public class WikiQAEntity extends DatabaseEntity {
-    public Long id;
+    public String id;
 
     public String questionId;
 
@@ -16,11 +16,11 @@ public class WikiQAEntity extends DatabaseEntity {
     public String titleWordIndices;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public WikiQAEntity setId(Long id) {
+    public WikiQAEntity setId(String id) {
         this.id = id;
         return this;
     }

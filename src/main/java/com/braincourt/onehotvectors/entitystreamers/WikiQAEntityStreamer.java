@@ -27,7 +27,7 @@ public class WikiQAEntityStreamer extends EntityStreamer {
     public List createEntities(JsonObject dataRow) {
         return Collections.singletonList(
                 new WikiQAEntity()
-                        .setId(currentId.getAndIncrement())
+                        .setId(Long.toString(currentId.getAndIncrement()))
                         .setQuestionId(dataRow.get("questionId").getAsString())
                         .setDocId(dataRow.get("docId").getAsString())
                         .setQuestionNGramIndices(getNgramIndices(dataRow, "questionTokens"))

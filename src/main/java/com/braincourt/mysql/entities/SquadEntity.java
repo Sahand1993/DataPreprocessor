@@ -2,7 +2,7 @@ package com.braincourt.mysql.entities;
 
 public class SquadEntity extends DatabaseEntity {
 
-    public long id;
+    public String id;
 
     public String questionId;
 
@@ -16,7 +16,7 @@ public class SquadEntity extends DatabaseEntity {
 
     public String titleWordIndices;
 
-    public SquadEntity setId(long id) {
+    public SquadEntity setId(String id) {
         this.id = id;
         return this;
     }
@@ -76,7 +76,7 @@ public class SquadEntity extends DatabaseEntity {
     }
 
     @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 }

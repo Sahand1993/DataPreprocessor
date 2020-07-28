@@ -33,7 +33,7 @@ public class NaturalQuestionTitleStreamer extends NaturalQuestionStreamer {
                 .setQuestionWordIndices(getQuestionWordIndices(dataRow))
                 .setTitleNGramIndices(getTitleNGramIndices(dataRow))
                 .setTitleWordIndices(getTitleWordIndices(dataRow))
-                .setId(dataRow.get("id").getAsLong())
+                .setId(dataRow.get("id").getAsString())
                 .setExampleId(dataRow.get("exampleId").getAsString());
         return Collections.singletonList(naturalQuestion);
     }

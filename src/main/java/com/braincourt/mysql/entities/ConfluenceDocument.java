@@ -2,20 +2,21 @@ package com.braincourt.mysql.entities;
 
 public class ConfluenceDocument extends DatabaseEntity {
 
-    public long id;
+    public String id;
 
     public String titleNGrams;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
     public void setTitleNGrams(String titleNGrams) {
         this.titleNGrams = titleNGrams;
     }
+
 }

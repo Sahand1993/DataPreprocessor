@@ -47,7 +47,7 @@ public class Rcv1ArticlesIndicesFileWriter extends FileWriter<RcvArticles> {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new java.io.FileWriter(path));
             ids.forEach(id -> {
-                Optional<RcvArticlesWithTopicTags> rcvArticle = repository.findById(id);
+                Optional<RcvArticlesWithTopicTags> rcvArticle = repository.findById(Long.toString(id));
                 rcvArticle.ifPresent(article -> {
                     try {
                         bufferedWriter.write(gson.toJson(article));

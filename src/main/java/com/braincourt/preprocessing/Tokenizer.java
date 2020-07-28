@@ -55,8 +55,9 @@ public class Tokenizer {
                 .map(this::removeEndPunctuation)
                 .map(String::toLowerCase)
                 .map(this::stem)
-                .filter(this::isValidToken)
-                .flatMap(this::splitOnApostrophe)
+                //.filter(this::isValidToken)
+                //.flatMap(this::splitOnApostrophe)
+                .filter(token -> !token.isEmpty())
                 .collect(Collectors.toList());
     }
 
@@ -80,7 +81,7 @@ public class Tokenizer {
     }
 
     public List<String> processTokens(String token) {
-        return processTokens(Arrays.stream(token.split(" ")));
+        return processTokens(Arrays.stream(token.split("\\s+| ")));
     }
 
     private String removeEndPunctuation(String token) {

@@ -8,13 +8,14 @@ import javax.persistence.Lob;
 public class DuplicateQuestions extends DatabaseEntity {
 
     @Id
-    public Long id;
+    public String id;
 
-    public Long getId() {
+    @Override
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

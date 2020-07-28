@@ -48,7 +48,7 @@ public class DuplicateQuestionStreamer extends EntityStreamer<DuplicateQuestions
         duplicateQuestions.setQuestion1Id(duplicateQuestionJson.get("question1Id").getAsInt());
         duplicateQuestions.setQuestion2Id(duplicateQuestionJson.get("question2Id").getAsInt());
 
-        duplicateQuestions.setId(duplicateQuestionJson.get("id").getAsLong());
+        duplicateQuestions.setId(duplicateQuestionJson.get("id").getAsString());
 
         return Collections.singletonList(duplicateQuestions);
     }

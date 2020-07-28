@@ -8,15 +8,16 @@ import javax.persistence.Lob;
 public class NaturalQuestions extends DatabaseEntity {
 
     @Id
-    public Long id;
+    public String id;
 
     public String exampleId;
 
-    public Long getId() {
+    @Override
+    public String getId() {
         return id;
     }
 
-    public NaturalQuestions setId(Long id) {
+    public NaturalQuestions setId(String id) {
         this.id = id;
         return this;
     }

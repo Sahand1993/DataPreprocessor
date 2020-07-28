@@ -27,7 +27,7 @@ public class SquadEntityStreamer extends EntityStreamer<SquadEntity> {
         SquadEntity squadEntity = new SquadEntity();
         return Collections.singletonList(
                 squadEntity
-                .setId(currentId.getAndIncrement())
+                .setId(Integer.toString(currentId.getAndIncrement()))
                 .setQuestionId(dataRow.get("questionId").getAsString())
                 .setTitleId(dataRow.get("titleId").getAsString())
                 .setQuestionNGramIndices(getNgramIndices(dataRow, "questionTokens"))

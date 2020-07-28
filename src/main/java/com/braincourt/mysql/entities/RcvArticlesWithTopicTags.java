@@ -12,13 +12,14 @@ import static com.braincourt.Constants.HAS_NUMBERS;
 public class RcvArticlesWithTopicTags extends RcvArticles {
 
     @Id
-    public Long id;
+    public String id;
 
-    public Long getId() {
+    @Override
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -30,7 +31,7 @@ public class RcvArticlesWithTopicTags extends RcvArticles {
     @Lob
     public String queryArticleWordIndices;
 
-    public Long relevantId;
+    public String relevantId;
 
     public RcvArticlesWithTopicTags() {
     }
@@ -109,7 +110,7 @@ public class RcvArticlesWithTopicTags extends RcvArticles {
         this.queryArticleWordIndices = articleWordIndices;
     }
 
-    public void setRelevantId(Long relevantId) {
+    public void setRelevantId(String relevantId) {
         this.relevantId = relevantId;
     }
 

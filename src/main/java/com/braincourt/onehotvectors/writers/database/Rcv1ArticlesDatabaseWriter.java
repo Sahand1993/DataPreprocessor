@@ -71,12 +71,13 @@ public class Rcv1ArticlesDatabaseWriter extends DatabaseWriter<RcvArticles> {
 
     private void createIndex() {
         LOG.info("Creating new index");
+        AtomicInteger processed = new AtomicInteger();
         LongStream.range(1, articlesWithTopicTagsRepository.count() + 1).boxed()
-                .map(id -> articlesWithTopicTagsRepository.findById(id).orElse(null))
+                .map(id -> articlesWithTopicTagsRepository.findById(Long.toString(id)).orElse(null))
                 .filter(Objects::nonNull)
                 .peek(article -> {
-                    if (article.getId() % 1000 == 0) {
-                        LOG.info(String.format("Adding %dth article to index", article.getId()));
+                    if (processed.get() % 1000 == 0) {
+                        LOG.info(String.format("Adding %dth article to index", processed.getAndIncrement()));
                     }
                 })
                 .forEach(this::addToIndex);
@@ -95,13 +96,13 @@ public class Rcv1ArticlesDatabaseWriter extends DatabaseWriter<RcvArticles> {
                 .forEach(field -> addToIndex(field.getName(), article.getId()));
     }
 
-    private void addToIndex(String fieldName, Long id) {
+    private void addToIndex(String fieldName, String id) {
         if (!reutersTagsToIdIndex.containsKey(fieldName)) {
-            Set<Long> postings = new HashSet<>();
+            Set<String> postings = new HashSet<>();
             postings.add(id);
             reutersTagsToIdIndex.put(fieldName, postings);
         } else {
-            Set<Long> postings = reutersTagsToIdIndex.get(fieldName);
+            Set<String> postings = reutersTagsToIdIndex.get(fieldName);
             postings.add(id);
         }
     }
@@ -150,12 +151,13 @@ public class Rcv1ArticlesDatabaseWriter extends DatabaseWriter<RcvArticles> {
     }
 
     private void addRelevantDocuments() {
+        AtomicInteger processed = new AtomicInteger();
         LongStream.range(1, articlesWithTopicTagsRepository.count() + 1).boxed()
-                .map(id -> articlesWithTopicTagsRepository.findById(id).orElse(null))
+                .map(id -> articlesWithTopicTagsRepository.findById(Long.toString(id)).orElse(null))
                 .filter(Objects::nonNull)
                 .peek(article -> {
-                    if (article.getId() % 1000 == 0) {
-                        LOG.info(String.format("Processing article %d", article.getId()));
+                    if (processed.get() % 1000 == 0) {
+                        LOG.info(String.format("Processing article %d", processed.getAndIncrement()));
                     }
                 })
                 .forEach(this::addRelevantDocument);
@@ -163,11 +165,11 @@ public class Rcv1ArticlesDatabaseWriter extends DatabaseWriter<RcvArticles> {
 
     private void addRelevantDocument(RcvArticlesWithTopicTags queryArticle) {
         List<String> existingTagGroups = getExistingTagGroups(queryArticle);
-        List<Long> relevantArticles = getArticlesWithTagGroups(existingTagGroups, queryArticle.getId());
+        List<String> relevantArticles = getArticlesWithTagGroups(existingTagGroups, queryArticle.getId());
         //System.out.println(queryArticle.getId());
         //System.out.println(relevantArticles);
         if (!relevantArticles.isEmpty()) {
-            long randomId = relevantArticles.get(random.nextInt(relevantArticles.size()));
+            String randomId = relevantArticles.get(random.nextInt(relevantArticles.size()));
 
             Optional<RcvArticlesWithTopicTags> relevantArticleOpt = articlesWithTopicTagsRepository.findById(randomId);
             if (relevantArticleOpt.isPresent()) {
@@ -196,7 +198,7 @@ public class Rcv1ArticlesDatabaseWriter extends DatabaseWriter<RcvArticles> {
                 .collect(Collectors.toList());
     }
 
-    List<Long> getArticlesWithTagGroups(List<String> tagGroups, long excludeId) {
+    List<String> getArticlesWithTagGroups(List<String> tagGroups, String excludeId) {
         return tagGroups.stream()
                 .flatMap(tagGroup -> reutersTagsToIdIndex.get(tagGroup).stream()
                         .filter(id -> !id.equals(excludeId)))
